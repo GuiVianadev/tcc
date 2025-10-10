@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: "bitnami/postgresql:latest"
+    container_name: tcc-backend
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: backend-tcc
+    ports:
+      - "5433:5432"
