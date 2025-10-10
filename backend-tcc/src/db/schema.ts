@@ -132,6 +132,8 @@ export const study_goals = pgTable("study_goals", {
     .notNull()
     .unique(),
 
+
+  area_of_interest: text().notNull(),
   daily_flashcards_goal: integer().default(FLASHCARD_GOAL).notNull(),
   daily_quizzes_goal: integer().default(10).notNull(),
 

@@ -2,8 +2,13 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --env-file .env --watch server.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +32,7 @@
     "drizzle-kit": "^0.31.5",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
+    "ultracite": "^5.6.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
   }
