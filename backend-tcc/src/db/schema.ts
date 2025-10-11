@@ -67,7 +67,9 @@ export const flashcards = pgTable(
     id: uuid().primaryKey().defaultRandom(),
     question: text().notNull(),
     answer: text().notNull(),
-    user_id: uuid().references(() => users.id, {onDelete: "cascade"}).notNull(),
+    user_id: uuid()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
     material_id: uuid()
       .references(() => materials.id, { onDelete: "cascade" })
       .notNull(),
@@ -121,7 +123,7 @@ export const study_sessions = pgTable(
   },
   (table) => [
     index("sessions_user_date_idx").on(table.user_id, table.date),
-    unique("sessions_user_date_unique").on(table.user_id, table.date)
+    unique("sessions_user_date_unique").on(table.user_id, table.date),
   ]
 );
 
@@ -131,7 +133,6 @@ export const study_goals = pgTable("study_goals", {
     .references(() => users.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
-
 
   area_of_interest: text().notNull(),
   daily_flashcards_goal: integer().default(FLASHCARD_GOAL).notNull(),

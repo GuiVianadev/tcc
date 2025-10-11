@@ -4,8 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --env-file .env --watch server.ts",
+    "dev": "tsx --env-file .env --experimental-strip-types --no-warnings --watch src/server.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
@@ -16,6 +15,7 @@
   "description": "",
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.1.0",
     "@fastify/jwt": "^10.0.0",
     "bcryptjs": "^3.0.2",
     "dayjs": "^1.11.18",
