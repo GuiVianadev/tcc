@@ -17,4 +17,25 @@ export class DrizzleUsersRepository implements UserRepository {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user ?? null;
   }
+
+  async updateUser(
+    id: string,
+    data: Partial<InferInsertModel<typeof users>>
+  ): Promise<InferInsertModel<typeof users>> {
+    const [userUpdated] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
+
+    return userUpdated;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const deleteRows = await db
+      .delete(users)
+      .where(eq(users.id, id))
+      .returning({ id: users.id });
+    return deleteRows.length > 0;
+  }
 }
