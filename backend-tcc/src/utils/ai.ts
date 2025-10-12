@@ -1,13 +1,13 @@
-// lib/ai-service.ts
+
 
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { z } from "zod";
 
-// Schemas (mesmo da versão anterior)
+
 const flashcardSchema = z.object({
   question: z.string().min(10).max(500),
-  answer: z.string().min(1).max(1000), // Reduzido de 10 para 1 para aceitar respostas curtas
+  answer: z.string().min(1).max(1000), 
 });
 
 const quizSchema = z.object({
@@ -16,7 +16,7 @@ const quizSchema = z.object({
     .array(
       z.object({
         id: z.enum(["a", "b", "c", "d"]),
-        text: z.string().min(1).max(300), // Reduzido de 5 para 1 para aceitar respostas curtas
+        text: z.string().min(1).max(300), 
       })
     )
     .length(4),
@@ -24,14 +24,13 @@ const quizSchema = z.object({
 });
 
 const aiResponseSchema = z.object({
-  summary: z.string().min(100).max(2000), // Aumentado para 2000 chars
+  summary: z.string().min(100).max(2000), 
   flashcards: z.array(flashcardSchema).min(5).max(20),
   quizzes: z.array(quizSchema).min(3).max(15),
 });
 
 export type AIResponse = z.infer<typeof aiResponseSchema>;
 
-// Configurações
 const DEFAULT_FLASHCARDS = 10;
 const DEFAULT_QUIZZES = 5;
 
@@ -40,9 +39,7 @@ type GenerateOptions = {
   quizzesQuantity?: number;
 };
 
-// ========================================
-// FUNÇÃO PRINCIPAL: Detecta tipo e chama apropriada
-// ========================================
+
 
 export async function generateContent(
   input: string | { buffer: Buffer; mimeType: string },
@@ -54,9 +51,6 @@ export async function generateContent(
   return generateFromFile(input.buffer, input.mimeType, options);
 }
 
-// ========================================
-// Geração a partir de TEXTO
-// ========================================
 
 async function generateFromText(
   text: string,
@@ -92,9 +86,6 @@ async function generateFromText(
   }
 }
 
-// ========================================
-// Geração a partir de ARQUIVO
-// ========================================
 
 async function generateFromFile(
   buffer: Buffer,
@@ -106,7 +97,7 @@ async function generateFromFile(
     quizzesQuantity = DEFAULT_QUIZZES,
   } = options;
 
-  // Valida formato suportado pelo Gemini
+  
   const GEMINI_SUPPORTED = [
     "application/pdf",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -122,7 +113,6 @@ async function generateFromFile(
   const prompt = buildPrompt(flashcardsQuantity, quizzesQuantity);
 
   try {
-    // Converter buffer para base64 (formato aceito pelo Gemini via AI SDK)
     const base64Data = buffer.toString("base64");
     const dataUrl = `data:${mimeType};base64,${base64Data}`;
 
@@ -153,9 +143,6 @@ async function generateFromFile(
   }
 }
 
-// ========================================
-// Helper: Monta o prompt
-// ========================================
 
 function buildPrompt(flashcardsQty: number, quizzesQty: number): string {
   return `Você é um especialista em educação e criação de materiais de estudo de alta qualidade.
