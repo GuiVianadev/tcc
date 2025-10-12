@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { UserAlreadyExistsError } from "../../../services/errors/user-already-exists-error.ts";
-import { makeRegisterUseCase } from "../../../services/factories/make-register.ts";
+import { makeRegisterUser } from "../../../services/factories/make-register.ts";
 
 const MIN_PASSWORD = 6;
 const MIN_NAME = 3;
@@ -18,7 +18,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
   const { name, email, password } = registerBodySchema.parse(request.body);
 
   try {
-    const registerUseCase = makeRegisterUseCase();
+    const registerUseCase = makeRegisterUser();
 
     await registerUseCase.execute({
       name,

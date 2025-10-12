@@ -25,8 +25,13 @@ export const users = pgTable("users", {
   password_hashed: text().notNull(),
   is_first_access: boolean().default(true).notNull(),
 
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").$onUpdate(() => new Date()),
+  updated_at: timestamp("updated_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
+  deleted_at: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
 });
 
 export const materials = pgTable(
@@ -40,7 +45,9 @@ export const materials = pgTable(
       .notNull(),
 
     created_at: timestamp("created_at").notNull().defaultNow(),
-    updated_at: timestamp("updated_at").$onUpdate(() => new Date()),
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [index("materials_user_idx").on(table.user_id)]
 );
@@ -80,7 +87,7 @@ export const flashcards = pgTable(
     repetitions: integer().default(0).notNull(),
     next_review: timestamp("next_review"),
 
-    created_at: timestamp("created_at").notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
   },
   (table) => [
     index("flashcards_material_idx").on(table.material_id),
@@ -138,6 +145,8 @@ export const study_goals = pgTable("study_goals", {
   daily_flashcards_goal: integer().default(FLASHCARD_GOAL).notNull(),
   daily_quizzes_goal: integer().default(10).notNull(),
 
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").$onUpdate(() => new Date()),
+  created_at: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
 });

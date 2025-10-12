@@ -1,4 +1,4 @@
-import { eq, type InferInsertModel } from "drizzle-orm";
+import { count, eq, type InferInsertModel, isNull } from "drizzle-orm";
 import { db } from "../../db/client.ts";
 import { users } from "../../db/schema.ts";
 import type { UserRepository } from "../users-repository.ts";
@@ -30,12 +30,46 @@ export class DrizzleUsersRepository implements UserRepository {
 
     return userUpdated;
   }
+  async findUsers(page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
+
+    const usersList = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        is_first_access: users.is_first_access,
+        created_at: users.created_at,
+        updated_at: users.updated_at,
+        deleted_at: users.deleted_at,
+      })
+      .from(users)
+      .where(isNull(users.deleted_at))
+      .limit(pageSize)
+      .offset(offset)
+      .orderBy(users.created_at);
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(users)
+      .where(isNull(users.deleted_at));
+
+    return {
+      users: usersList,
+      total: total || 0,
+      page,
+      pageSize,
+    };
+  }
 
   async deleteUser(id: string): Promise<boolean> {
-    const deleteRows = await db
-      .delete(users)
+    const result = await db
+      .update(users)
+      .set({ deleted_at: new Date() })
       .where(eq(users.id, id))
       .returning({ id: users.id });
-    return deleteRows.length > 0;
+
+    return result.length > 0;
   }
 }

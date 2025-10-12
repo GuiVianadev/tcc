@@ -3,6 +3,15 @@ import type { users } from "../db/schema.ts";
 
 export type User = InferSelectModel<typeof users>;
 
+export type PublicUser = Omit<User, "password_hashed">;
+
+export type PaginatedUsers = {
+  users: PublicUser[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
 export type UserRepository = {
   create(
     data: InferInsertModel<typeof users>
@@ -13,5 +22,6 @@ export type UserRepository = {
   ): Promise<InferInsertModel<typeof users>>;
   findByEmail(email: string): Promise<InferInsertModel<typeof users> | null>;
   findById(id: string): Promise<InferSelectModel<typeof users> | null>;
+  findUsers(page: number, pageSize: number): Promise<PaginatedUsers>;
   deleteUser(id: string): Promise<boolean>;
 };

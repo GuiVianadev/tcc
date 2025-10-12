@@ -8,7 +8,7 @@ import { db } from "../../db/client.ts";
 import { materials } from "../../db/schema.ts";
 import type { MaterialsRepository } from "../materials-repository.ts";
 
-const LIMIT_ITENS = 20;
+
 
 export class DrizzleUsersRepository implements MaterialsRepository {
   async create(
@@ -32,15 +32,16 @@ export class DrizzleUsersRepository implements MaterialsRepository {
   }
   async searchManyByUserId(
     userId: string,
-    page: number
+    page: number,
+    pageSize: number
   ): Promise<InferSelectModel<typeof materials>[]> {
     const userMaterials = await db
       .select()
       .from(materials)
       .where(eq(materials.user_id, userId))
       .orderBy(asc(materials.id))
-      .limit(LIMIT_ITENS)
-      .offset((page - 1) * LIMIT_ITENS);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
 
     return userMaterials;
   }

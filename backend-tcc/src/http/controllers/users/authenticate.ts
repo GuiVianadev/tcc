@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { InvalidCredentialsError } from "../../../services/errors/invalid-credentials-error.ts";
-import { makeAutheticateUseCase } from "../../../services/factories/make-authenticate.ts";
+import { makeAutheticateUser } from "../../../services/factories/make-authenticate.ts";
 
 const OK = 200;
 const UNAUTHORIZED = 401;
@@ -19,7 +19,7 @@ export async function autheticate(
   const { email, password } = authenticateBodySchema.parse(request.body);
 
   try {
-    const authenticateUseCase = makeAutheticateUseCase();
+    const authenticateUseCase = makeAutheticateUser();
     const { user } = await authenticateUseCase.execute({
       email,
       password,
