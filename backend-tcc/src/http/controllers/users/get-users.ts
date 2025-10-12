@@ -3,7 +3,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { UnauthorizedError } from "../../../services/errors/unauthorized-error.ts";
-import { makeGetUsers } from "../../../services/factories/make-get-users.ts";
+import { makeGetUsers } from "../../../services/factories/user/make-get-users.ts";
 
 const OK = 200;
 const UNAUTHORIZED = 403;

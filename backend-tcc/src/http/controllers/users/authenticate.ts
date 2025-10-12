@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { InvalidCredentialsError } from "../../../services/errors/invalid-credentials-error.ts";
-import { makeAutheticateUser } from "../../../services/factories/make-authenticate.ts";
+import { makeAutheticateUser } from "../../../services/factories/user/make-authenticate.ts";
 
 const OK = 200;
 const UNAUTHORIZED = 401;

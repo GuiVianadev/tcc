@@ -1,9 +1,9 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { UserAlreadyExistsError } from "../../../services/errors/user-already-exists-error.ts";
-import { makeRegisterUser } from "../../../services/factories/make-register.ts";
+import { makeRegisterUser } from "../../../services/factories/user/make-register.ts";
 
-const MIN_PASSWORD = 6;
+const MIN_PASSWORD = 8;
 const MIN_NAME = 3;
 const CONFLICT = 409;
 const CREATED = 201;

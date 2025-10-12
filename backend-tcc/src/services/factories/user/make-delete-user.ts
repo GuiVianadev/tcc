@@ -1,5 +1,5 @@
-import { DrizzleUsersRepository } from "../../repositories/drizzle/drizzle-users-repository.ts";
-import { DeleteUserService } from "../users/delete.ts";
+import { DrizzleUsersRepository } from "../../../repositories/drizzle/drizzle-users-repository.ts";
+import { DeleteUserService } from "../../users/delete.ts";
 
 export function makeDeleteUser() {
   const userRepository = new DrizzleUsersRepository();

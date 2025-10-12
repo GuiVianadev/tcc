@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { UnauthorizedError } from "@/services/errors/unauthorized-error.ts";
-import { makeDeleteUser } from "@/services/factories/make-delete-user.ts";
+import { makeDeleteUser } from "@/services/factories/user/make-delete-user.ts";
 
 const FORBIDDEN = 403;
 const NO_CONTENT = 204;

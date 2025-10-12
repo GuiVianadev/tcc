@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { NotFoundError } from "@/services/errors/not-found.error.ts";
-import { makeGetUserProfile } from "../../../services/factories/make-get-user-profile.ts";
+import { makeGetUserProfile } from "../../../services/factories/user/make-get-user-profile.ts";
 
 const OK = 200;
 const NOT_FOUND = 404;

@@ -5,12 +5,12 @@ import {
   type InferSelectModel,
 } from "drizzle-orm";
 import { db } from "../../db/client.ts";
-import { materials } from "../../db/schema.ts";
-import type { MaterialsRepository } from "../materials-repository.ts";
+import { flashcards, materials, quizzes, summaries } from "../../db/schema.ts";
+import type { CreateMaterialWithContent, MaterialsRepository } from "../materials-repository.ts";
 
 
 
-export class DrizzleUsersRepository implements MaterialsRepository {
+export class DrizzleMaterialsRepository implements MaterialsRepository {
   async create(
     data: InferInsertModel<typeof materials>
   ): Promise<InferInsertModel<typeof materials>> {
@@ -20,6 +20,61 @@ export class DrizzleUsersRepository implements MaterialsRepository {
       .returning();
     return createdMaterial;
   }
+
+  async createWithContent(data: CreateMaterialWithContent) {
+    return await db.transaction(async (tx) => {
+      // 1. Criar material
+      const [createdMaterial] = await tx
+        .insert(materials)
+        .values(data.material)
+        .returning();
+
+      // 2. Criar summary
+      const [createdSummary] = await tx
+        .insert(summaries)
+        .values({
+          content: data.summary.content,
+          user_id: data.summary.user_id,
+          material_id: createdMaterial.id,
+        })
+        .returning();
+
+      // 3. Criar flashcards
+      const createdFlashcards = await tx
+        .insert(flashcards)
+        .values(
+          data.flashcards.map((fc) => ({
+            question: fc.question,
+            answer: fc.answer,
+            user_id: fc.user_id,
+            material_id: createdMaterial.id,
+          }))
+        )
+        .returning();
+
+      // 4. Criar quizzes
+      const createdQuizzes = await tx
+        .insert(quizzes)
+        .values(
+          data.quizzes.map((quiz) => ({
+            question: quiz.question,
+            options: quiz.options,
+            correct_answer: quiz.correct_answer,
+            user_id: quiz.user_id,
+            material_id: createdMaterial.id,
+          }))
+        )
+        .returning();
+
+      return {
+        material: createdMaterial,
+        summary: createdSummary,
+        flashcards: createdFlashcards,
+        quizzes: createdQuizzes,
+      };
+    });
+  }
+
   async findById(
     id: string
   ): Promise<InferSelectModel<typeof materials> | null> {

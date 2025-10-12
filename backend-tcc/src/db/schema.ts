@@ -57,6 +57,9 @@ export const summaries = pgTable(
   {
     id: uuid().primaryKey().defaultRandom(),
     content: text().notNull(),
+    user_id: uuid()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
 
     material_id: uuid()
       .references(() => materials.id, { onDelete: "cascade" })
@@ -87,7 +90,9 @@ export const flashcards = pgTable(
     repetitions: integer().default(0).notNull(),
     next_review: timestamp("next_review"),
 
-    created_at: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     index("flashcards_material_idx").on(table.material_id),
@@ -102,7 +107,9 @@ export const quizzes = pgTable(
     question: text().notNull(),
     options: jsonb().notNull(), // [{ id: "a", text: "..." }, ...]
     correct_answer: text().notNull(), // "a", "b", "c", "d"
-
+    user_id: uuid()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
     material_id: uuid()
       .references(() => materials.id, { onDelete: "cascade" })
       .notNull(),
@@ -145,7 +152,9 @@ export const study_goals = pgTable("study_goals", {
   daily_flashcards_goal: integer().default(FLASHCARD_GOAL).notNull(),
   daily_quizzes_goal: integer().default(10).notNull(),
 
-  created_at: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),

@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { NotFoundError } from "@/services/errors/not-found.error.ts";
 import { UnauthorizedError } from "@/services/errors/unauthorized-error.ts";
-import { makeUpdateUser } from "@/services/factories/make-update-user.ts";
+import { makeUpdateUser } from "@/services/factories/user/make-update-user.ts";
 import { UserAlreadyExistsError } from "../../../services/errors/user-already-exists-error.ts";
 
 const MIN_PASSWORD = 8;

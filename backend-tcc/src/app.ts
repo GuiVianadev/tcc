@@ -1,8 +1,10 @@
 import { fastifyCookie } from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import multipart from "@fastify/multipart";
 import fastify from "fastify";
 import { env } from "./env/index.ts";
+import { materialsRoutes } from "./http/controllers/materials/routes.ts";
 import { userRoutes } from "./http/controllers/users/routes.ts";
 
 export const app = fastify();
@@ -27,4 +29,13 @@ app.register(fastifyJwt, {
 
 app.register(fastifyCookie);
 
+const SIZE_FILE = 1024;
+
+app.register(multipart, {
+  limits: {
+    fileSize: 10 * SIZE_FILE * SIZE_FILE, // 10MB
+  },
+});
+
 app.register(userRoutes);
+app.register(materialsRoutes);
