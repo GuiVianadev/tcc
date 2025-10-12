@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "../../db/client.ts";
 import { materials, quizzes } from "../../db/schema.ts";
 import type { Quiz, QuizListItem, QuizzesRepository } from "../quizzes-repository.ts";
@@ -43,5 +43,65 @@ export class DrizzleQuizzesRepository implements QuizzesRepository {
       .execute();
 
     return quizzesList;
+  }
+
+  async findUnstudiedByMaterialId(materialId: string, limit: number): Promise<Quiz[]> {
+    const unstudiedQuizzes = await db
+      .select()
+      .from(quizzes)
+      .where(
+        and(
+          eq(quizzes.material_id, materialId),
+          eq(quizzes.studied, false)
+        )
+      )
+      .limit(limit)
+      .execute();
+
+    return unstudiedQuizzes;
+  }
+
+  async markAsStudied(quizId: string): Promise<Quiz> {
+    const [updatedQuiz] = await db
+      .update(quizzes)
+      .set({ studied: true })
+      .where(eq(quizzes.id, quizId))
+      .returning()
+      .execute();
+
+    return updatedQuiz;
+  }
+
+  async countByMaterialId(materialId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(quizzes)
+      .where(eq(quizzes.material_id, materialId))
+      .execute();
+
+    return result?.count || 0;
+  }
+
+  async countStudiedByMaterialId(materialId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(quizzes)
+      .where(
+        and(
+          eq(quizzes.material_id, materialId),
+          eq(quizzes.studied, true)
+        )
+      )
+      .execute();
+
+    return result?.count || 0;
+  }
+
+  async resetProgress(materialId: string): Promise<void> {
+    await db
+      .update(quizzes)
+      .set({ studied: false })
+      .where(eq(quizzes.material_id, materialId))
+      .execute();
   }
 }

@@ -19,4 +19,12 @@ export type QuizzesRepository = {
     page: number,
     pageSize: number
   ): Promise<QuizListItem[]>;
+  findUnstudiedByMaterialId(
+    materialId: string,
+    limit: number
+  ): Promise<Quiz[]>;
+  markAsStudied(quizId: string): Promise<Quiz>;
+  countByMaterialId(materialId: string): Promise<number>;
+  countStudiedByMaterialId(materialId: string): Promise<number>;
+  resetProgress(materialId: string): Promise<void>;
 };

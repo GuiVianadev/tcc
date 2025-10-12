@@ -51,6 +51,9 @@ export class AnswerQuizService {
     // Comparar selectedAnswer com quiz.correct_answer
     const isCorrect = selectedAnswer === quiz.correct_answer;
 
+    // Marcar quiz como estudado
+    await this.quizzesRepository.markAsStudied(quizId);
+
     // Salvar tentativa em quiz_attempts
     await this.quizAttemptsRepository.create({
       quiz_id: quizId,
