@@ -1,5 +1,7 @@
 import type { MaterialsRepository } from "../../repositories/materials-repository.ts";
+import type { QuizAttemptsRepository } from "../../repositories/quiz-attempts-repository.ts";
 import type { QuizzesRepository } from "../../repositories/quizzes-repository.ts";
+import type { StudySessionsRepository } from "../../repositories/study-sessions-repository.ts";
 import { NotFoundError } from "../errors/not-found.error.ts";
 import { UnauthorizedError } from "../errors/unauthorized-error.ts";
 
@@ -17,7 +19,9 @@ interface AnswerQuizResponse {
 export class AnswerQuizService {
   constructor(
     private materialsRepository: MaterialsRepository,
-    private quizzesRepository: QuizzesRepository
+    private quizzesRepository: QuizzesRepository,
+    private quizAttemptsRepository: QuizAttemptsRepository,
+    private studySessionsRepository: StudySessionsRepository
   ) {}
 
   async execute({
@@ -47,7 +51,21 @@ export class AnswerQuizService {
     // Comparar selectedAnswer com quiz.correct_answer
     const isCorrect = selectedAnswer === quiz.correct_answer;
 
-    // TODO FUTURO: Salvar tentativa em quiz_attempts (opcional)
+    // Salvar tentativa em quiz_attempts
+    await this.quizAttemptsRepository.create({
+      quiz_id: quizId,
+      user_id: userId,
+      selected_answer: selectedAnswer,
+      is_correct: isCorrect,
+    });
+
+    // Atualizar study_session
+    await this.studySessionsRepository.upsertSession({
+      user_id: userId,
+      date: new Date(),
+      quizzes_completed: 1,
+      quizzes_correct: isCorrect ? 1 : 0,
+    });
 
     return {
       isCorrect,

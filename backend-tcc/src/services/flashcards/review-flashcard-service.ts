@@ -1,25 +1,32 @@
 import type { Difficulty } from "../../lib/srs-algorithm.ts";
 import { calculateSM2 } from "../../lib/srs-algorithm.ts";
-import type { Flashcard, FlashcardsRepository } from "../../repositories/flashcards-repository.ts";
+import type { FlashcardReviewsRepository } from "../../repositories/flashcard-reviews-repository.ts";
+import type {
+  Flashcard,
+  FlashcardsRepository,
+} from "../../repositories/flashcards-repository.ts";
 import type { MaterialsRepository } from "../../repositories/materials-repository.ts";
+import type { StudySessionsRepository } from "../../repositories/study-sessions-repository.ts";
 import { NotFoundError } from "../errors/not-found.error.ts";
 import { UnauthorizedError } from "../errors/unauthorized-error.ts";
 
-interface ReviewFlashcardRequest {
+type ReviewFlashcardRequest = {
   userId: string;
   flashcardId: string;
   difficulty: Difficulty;
-}
+};
 
-interface ReviewFlashcardResponse {
+type ReviewFlashcardResponse = {
   flashcard: Flashcard;
   nextReview: Date;
-}
+};
 
 export class ReviewFlashcardService {
   constructor(
     private flashcardsRepository: FlashcardsRepository,
-    private materialsRepository: MaterialsRepository
+    private materialsRepository: MaterialsRepository,
+    private flashcardReviewsRepository: FlashcardReviewsRepository,
+    private studySessionsRepository: StudySessionsRepository
   ) {}
 
   async execute({
@@ -35,7 +42,9 @@ export class ReviewFlashcardService {
     }
 
     // Buscar material do flashcard
-    const material = await this.materialsRepository.findById(flashcard.material_id);
+    const material = await this.materialsRepository.findById(
+      flashcard.material_id
+    );
 
     if (!material) {
       throw new NotFoundError();
@@ -60,7 +69,23 @@ export class ReviewFlashcardService {
       sm2Result
     );
 
-    // TODO FUTURO: Atualizar study_session (incrementar flashcards_studied)
+    // Salvar histórico de revisão
+    await this.flashcardReviewsRepository.create({
+      flashcard_id: flashcardId,
+      user_id: userId,
+      difficulty,
+      ease_factor_after: sm2Result.ease_factor,
+      interval_days_after: sm2Result.interval_days,
+    });
+
+    // Atualizar study_session
+    const isCorrect = difficulty === "good" || difficulty === "easy";
+    await this.studySessionsRepository.upsertSession({
+      user_id: userId,
+      date: new Date(),
+      flashcards_studied: 1,
+      flashcards_correct: isCorrect ? 1 : 0,
+    });
 
     return {
       flashcard: updatedFlashcard,

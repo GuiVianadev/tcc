@@ -1,19 +1,16 @@
 import { DrizzleFlashcardReviewsRepository } from "../../../repositories/drizzle/drizzle-flashcard-reviews-repository.ts";
 import { DrizzleFlashcardsRepository } from "../../../repositories/drizzle/drizzle-flashcards-repository.ts";
 import { DrizzleMaterialsRepository } from "../../../repositories/drizzle/drizzle-materials-repository.ts";
-import { DrizzleStudySessionsRepository } from "../../../repositories/drizzle/drizzle-study-sessions-repository.ts";
-import { ReviewFlashcardService } from "../../flashcards/review-flashcard-service.ts";
+import { GetFlashcardHistoryService } from "../../flashcards/get-flashcard-history-service.ts";
 
-export function makeReviewFlashcardService() {
+export function makeGetFlashcardHistoryService() {
   const flashcardsRepository = new DrizzleFlashcardsRepository();
   const materialsRepository = new DrizzleMaterialsRepository();
   const flashcardReviewsRepository = new DrizzleFlashcardReviewsRepository();
-  const studySessionsRepository = new DrizzleStudySessionsRepository();
-  const service = new ReviewFlashcardService(
+  const service = new GetFlashcardHistoryService(
     flashcardsRepository,
     materialsRepository,
-    flashcardReviewsRepository,
-    studySessionsRepository
+    flashcardReviewsRepository
   );
 
   return service;

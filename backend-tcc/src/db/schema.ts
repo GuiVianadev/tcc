@@ -107,6 +107,7 @@ export const quizzes = pgTable(
     question: text().notNull(),
     options: jsonb().notNull(), // [{ id: "a", text: "..." }, ...]
     correct_answer: text().notNull(), // "a", "b", "c", "d"
+    studied: boolean().default(false).notNull(), // Marca se já foi respondido
     user_id: uuid()
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
@@ -116,7 +117,10 @@ export const quizzes = pgTable(
 
     created_at: timestamp("created_at").notNull().defaultNow(),
   },
-  (table) => [index("quizzes_material_idx").on(table.material_id)]
+  (table) => [
+    index("quizzes_material_idx").on(table.material_id),
+    index("quizzes_studied_idx").on(table.studied),
+  ]
 );
 
 export const study_sessions = pgTable(
@@ -159,3 +163,50 @@ export const study_goals = pgTable("study_goals", {
     .notNull()
     .defaultNow(),
 });
+
+// Analytics - Quiz Attempts
+export const quiz_attempts = pgTable(
+  "quiz_attempts",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    quiz_id: uuid()
+      .references(() => quizzes.id, { onDelete: "cascade" })
+      .notNull(),
+    user_id: uuid()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    selected_answer: text().notNull(),
+    is_correct: boolean().notNull(),
+    attempted_at: timestamp("attempted_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("quiz_attempts_quiz_idx").on(table.quiz_id),
+    index("quiz_attempts_user_idx").on(table.user_id),
+  ]
+);
+
+// Analytics - Flashcard Reviews
+export const flashcard_reviews = pgTable(
+  "flashcard_reviews",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    flashcard_id: uuid()
+      .references(() => flashcards.id, { onDelete: "cascade" })
+      .notNull(),
+    user_id: uuid()
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    difficulty: text().notNull(), // "again", "hard", "good", "easy"
+    ease_factor_after: real().notNull(),
+    interval_days_after: integer().notNull(),
+    reviewed_at: timestamp("reviewed_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("flashcard_reviews_flashcard_idx").on(table.flashcard_id),
+    index("flashcard_reviews_user_idx").on(table.user_id),
+  ]
+);
