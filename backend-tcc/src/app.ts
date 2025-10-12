@@ -4,7 +4,10 @@ import fastifyJwt from "@fastify/jwt";
 import multipart from "@fastify/multipart";
 import fastify from "fastify";
 import { env } from "./env/index.ts";
+import { flashcardsRoutes } from "./http/controllers/flashcards/routes.ts";
 import { materialsRoutes } from "./http/controllers/materials/routes.ts";
+import { quizzesRoutes } from "./http/controllers/quizzes/routes.ts";
+import { summariesRoutes } from "./http/controllers/summaries/routes.ts";
 import { userRoutes } from "./http/controllers/users/routes.ts";
 
 export const app = fastify();
@@ -39,3 +42,6 @@ app.register(multipart, {
 
 app.register(userRoutes);
 app.register(materialsRoutes);
+app.register(summariesRoutes);
+app.register(quizzesRoutes);
+app.register(flashcardsRoutes);
