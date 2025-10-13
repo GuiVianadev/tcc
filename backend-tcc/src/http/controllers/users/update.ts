@@ -17,9 +17,10 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     name: z.string().min(MIN_NAME).optional(),
     email: z.email().optional(),
     password: z.string().min(MIN_PASSWORD).optional(),
+    is_first_access: z.boolean().optional(),
   });
 
-  const { name, email, password } = updateUserBodySchema.parse(request.body);
+  const { name, email, password, is_first_access } = updateUserBodySchema.parse(request.body);
 
   try {
     const updateUseCase = makeUpdateUser();
@@ -30,6 +31,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       name,
       email,
       password,
+      is_first_access,
     });
   } catch (err) {
     if (err instanceof NotFoundError) {

@@ -12,6 +12,7 @@ type UpdateUserServiceRequest = {
   name?: string;
   email?: string;
   password?: string;
+  is_first_access?: boolean;
 };
 
 type UpdateUserServiceResponse = {
@@ -31,6 +32,7 @@ export class UpdateUserService {
     name,
     email,
     password,
+    is_first_access,
   }: UpdateUserServiceRequest): Promise<UpdateUserServiceResponse> {
     const SALT_HASH = 6;
 
@@ -66,6 +68,9 @@ export class UpdateUserService {
     }
     if (password) {
       dataToUpdate.password_hashed = await hash(password, SALT_HASH);
+    }
+    if (is_first_access !== undefined) {
+      dataToUpdate.is_first_access = is_first_access;
     }
     const userUpdated = await this.userRepository.updateUser(
       userId,

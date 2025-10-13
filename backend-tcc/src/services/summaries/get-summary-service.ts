@@ -1,5 +1,8 @@
 import type { MaterialsRepository } from "../../repositories/materials-repository.ts";
-import type { Summary, SummariesRepository } from "../../repositories/summaries-repository.ts";
+import type {
+  SummariesRepository,
+  Summary,
+} from "../../repositories/summaries-repository.ts";
 import { NotFoundError } from "../errors/not-found.error.ts";
 import { UnauthorizedError } from "../errors/unauthorized-error.ts";
 

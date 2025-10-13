@@ -31,5 +31,6 @@ export type MaterialsRepository = {
   }>;
   findById(id: string): Promise<InferSelectModel<typeof materials> | null>;
   searchManyByUserId(userId: string, page: number, pageSize: number): Promise<Materials[]>;
+  countByUserId(userId: string): Promise<number>;
   deleteMaterial(id: string): Promise<boolean>;
 };

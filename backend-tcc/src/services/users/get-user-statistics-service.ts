@@ -1,12 +1,12 @@
-import { and, count, eq, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { db } from "../../db/client.ts";
 import { flashcard_reviews, quiz_attempts } from "../../db/schema.ts";
 
-interface GetUserStatisticsRequest {
+type GetUserStatisticsRequest = {
   userId: string;
-}
+};
 
-interface GetUserStatisticsResponse {
+type GetUserStatisticsResponse = {
   quizzes: {
     total_attempts: number;
     correct_attempts: number;
@@ -21,7 +21,7 @@ interface GetUserStatisticsResponse {
       easy: number;
     };
   };
-}
+};
 
 export class GetUserStatisticsService {
   async execute({

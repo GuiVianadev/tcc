@@ -4,7 +4,7 @@ import { db } from "@/db/client.ts";
 import { flashcards, quizzes, summaries } from "@/db/schema.ts";
 import type { MaterialsRepository } from "@/repositories/materials-repository.ts";
 import type { UserRepository } from "@/repositories/users-repository.ts";
-import { generateContent } from "@/utils/ai.ts";
+import { generateContent } from "../../utils/ai.ts";
 import { NotFoundError } from "../errors/not-found.error.ts";
 
 type CreateMaterialRequest = {

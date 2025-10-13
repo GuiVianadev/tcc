@@ -8,17 +8,17 @@ const MIN_SUMMARY = 100;
 const MAX_SUMMARY = 1000;
 
 const flashcardSchema = z.object({
-  question: z.string().min(5).max(MAX_QUESTION),
-  answer: z.string().min(5).max(MAX_ANSWER),
+  question: z.string().min(10).max(MAX_QUESTION),
+  answer: z.string().min(10).max(MAX_ANSWER),
 });
 
 const quizSchema = z.object({
-  question: z.string().min(5).max(MAX_QUESTION),
+  question: z.string().min(10).max(MAX_QUESTION),
   options: z
     .array(
       z.object({
         id: z.enum(["a", "b", "c", "d"]),
-        text: z.string().min(3).max(MAX_QUESTION),
+        text: z.string().min(1).max(MAX_QUESTION), // Reduzido de 5 para 1 (aceita "Sim", "Não", etc)
       })
     )
     .length(4),
@@ -26,9 +26,12 @@ const quizSchema = z.object({
 });
 
 const aiResponseSchema = z.object({
-  summary: z.string().min(50).max(MAX_SUMMARY * 2), // Mais flexível para resumos
+  summary: z
+    .string()
+    .min(MIN_SUMMARY)
+    .max(MAX_SUMMARY * 2), // Aumentado para 2000 caracteres
   flashcards: z.array(flashcardSchema).min(5).max(20),
-  quizzes: z.array(quizSchema).min(10).max(20), // Flexível: entre 10-20 quizzes (evita falhas de validação)
+  quizzes: z.array(quizSchema).min(10).max(15), // Limite do Gemini para evitar timeout
 });
 
 export type AIResponse = z.infer<typeof aiResponseSchema>;
@@ -108,6 +111,9 @@ async function generateFromFile(
   const prompt = buildPrompt(flashcardsQuantity, quizzesQuantity);
 
   try {
+    const base64Data = buffer.toString("base64");
+    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
     const result = await generateObject({
       model: google("gemini-2.0-flash-exp"),
       messages: [
@@ -115,9 +121,8 @@ async function generateFromFile(
           role: "user",
           content: [
             {
-              type: "file",
-              data: buffer,
-              mimeType,
+              type: "image",
+              image: dataUrl,
             },
             {
               type: "text",
@@ -132,7 +137,6 @@ async function generateFromFile(
 
     return result.object;
   } catch (error) {
-    console.error("Erro ao gerar conteúdo com IA:", error);
     throw new Error("Falha ao processar arquivo com IA");
   }
 }

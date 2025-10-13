@@ -38,22 +38,21 @@ export class GetMaterialsService {
   async execute(request: GetMaterialsRequest): Promise<PaginatedMaterials> {
     const { userId, page, pageSize } = request;
 
-    // 1. Validar se usu�rio existe
+    // 1. Validar se usuário existe
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundError();
     }
 
-    // 2. Buscar materiais do usu�rio
+    // 2. Buscar materiais do usuário (paginado)
     const materials = await this.materialRepository.searchManyByUserId(
       userId,
       page,
       pageSize
     );
 
-    // 3. Calcular total (idealmente o repository deveria retornar isso tamb�m)
-    // Por enquanto vou retornar o length, mas isso n�o � ideal para pagina��o real
-    const total = materials.length;
+    // 3. Buscar total de materiais do usuário
+    const total = await this.materialRepository.countByUserId(userId);
 
     return {
       materials,

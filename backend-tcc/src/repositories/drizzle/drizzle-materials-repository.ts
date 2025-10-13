@@ -1,5 +1,6 @@
 import {
   asc,
+  count,
   eq,
   type InferInsertModel,
   type InferSelectModel,
@@ -99,6 +100,15 @@ export class DrizzleMaterialsRepository implements MaterialsRepository {
       .offset((page - 1) * pageSize);
 
     return userMaterials;
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(materials)
+      .where(eq(materials.user_id, userId));
+
+    return result.count;
   }
 
   async deleteMaterial(id: string): Promise<boolean> {
