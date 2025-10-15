@@ -15,7 +15,6 @@ export async function signIn({ email, password }: SignInBody) {
     password,
   });
 
-  // Salva o token no localStorage
   localStorage.setItem("@cognitio:token", response.data.token);
 
   return response.data;

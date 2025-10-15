@@ -17,6 +17,11 @@ export type UpsertStudyGoalsRequest = {
   daily_flashcards_goal: number;
   daily_quizzes_goal: number;
 };
+export type UpdateStudyGoalsRequest = {
+  area_of_interest?: string;
+  daily_flashcards_goal?: number;
+  daily_quizzes_goal?: number;
+};
 
 // ========== API FUNCTIONS ==========
 
@@ -33,5 +38,9 @@ export async function getStudyGoals() {
  */
 export async function upsertStudyGoals(data: UpsertStudyGoalsRequest) {
   const response = await api.post<StudyGoals>("/study-goals", data);
+  return response.data;
+}
+export async function updateStudyGoals(data: UpdateStudyGoalsRequest) {
+  const response = await api.patch<StudyGoals>("/study-goals", data);
   return response.data;
 }

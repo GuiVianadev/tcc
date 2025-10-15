@@ -62,7 +62,7 @@ const items = [
     icon: ClipboardList,
   },
   {
-    title: "Settings",
+    title: "Configurações",
     url: "settings",
     icon: Settings,
   },
