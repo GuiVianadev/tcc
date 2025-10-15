@@ -10,9 +10,9 @@ export type QuizOption = {
 export type Quiz = {
   id: string;
   question: string;
-  options: QuizOption[];
-  correct_answer: string;
-  studied: boolean;
+  options?: QuizOption[]; // Opcional, pode não vir na listagem
+  correct_answer?: string; // Opcional, pode não vir na listagem
+  studied?: boolean; // Opcional
   material_id: string;
   material_title?: string;
   created_at: string;
@@ -63,11 +63,11 @@ export async function getAllQuizzes(page = 1) {
  * Busca quizzes de um material específico
  */
 export async function getMaterialQuizzes(materialId: string) {
-  const response = await api.get<GetQuizzesResponse>(
+  const response = await api.get<{ quizzes: Quiz[] }>(
     `/materials/${materialId}/quizzes`
   );
 
-  return response.data;
+  return response.data.quizzes;
 }
 
 /**

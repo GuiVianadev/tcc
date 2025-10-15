@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Brain, BookOpen, ClipboardList } from "lucide-react";
 import { useMaterials, useDeleteMaterial } from "@/hooks/use-materials";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -84,7 +85,7 @@ export function Materials() {
         </div>
         <Button
           onClick={() => navigate("/materials/create")}
-          className="bg-blue-800 hover:bg-blue-700"
+          className="bg-foreground"
         >
           Criar Material
         </Button>
@@ -132,7 +133,7 @@ export function Materials() {
             </p>
             <Button
               onClick={() => navigate("/materials/create")}
-              className="bg-blue-800 hover:bg-blue-700"
+              className="bg-foreground"
             >
               Criar Primeiro Material
             </Button>
@@ -156,15 +157,33 @@ export function Materials() {
                   <p className="mb-4 flex-1 text-muted-foreground text-sm">
                     {truncateContent(material.content)}
                   </p>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => navigate(`/materials/${material.id}`)}
-                    >
-                      Ver Detalhes
-                    </Button>
+                  <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/summaries/${material.id}`)}
+                      >
+                        <BookOpen className="mr-1 h-4 w-4" />
+                        Resumo
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/materials/${material.id}/flashcards`)}
+                      >
+                        <Brain className="mr-1 h-4 w-4" />
+                        Cards
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/materials/${material.id}/quizzes`)}
+                      >
+                        <ClipboardList className="mr-1 h-4 w-4" />
+                        Quizzes
+                      </Button>
+                    </div>
                     <Button
                       variant="destructive"
                       size="sm"

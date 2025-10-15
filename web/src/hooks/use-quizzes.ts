@@ -20,6 +20,11 @@ export function useQuizzes(page = 1) {
 }
 
 /**
+ * Alias para useQuizzes (para compatibilidade)
+ */
+export const useAllQuizzes = useQuizzes;
+
+/**
  * Hook para listar quizzes de um material específico
  */
 export function useMaterialQuizzes(materialId: string) {

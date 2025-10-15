@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { useUserStatistics } from "@/hooks/use-statistics";
 
 import {
   Card,
@@ -16,44 +17,62 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const description = "An interactive bar chart";
 
-const chartData = [
-  { date: "2024-06-22", desktop: 317, mobile: 270 },
-  { date: "2024-06-23", desktop: 480, mobile: 530 },
-  { date: "2024-06-24", desktop: 132, mobile: 180 },
-  { date: "2024-06-25", desktop: 141, mobile: 190 },
-  { date: "2024-06-26", desktop: 434, mobile: 380 },
-  { date: "2024-06-27", desktop: 448, mobile: 490 },
-  { date: "2024-06-28", desktop: 149, mobile: 200 },
-];
-
 const chartConfig = {
-  views: {
-    label: "Cards estudados",
-  },
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-2)",
-  },
-  mobile: {
-    label: "Mobile",
+  flashcards_reviewed: {
+    label: "Flashcards",
     color: "var(--chart-1)",
+  },
+  quizzes_completed: {
+    label: "Quizzes",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
 export function ChartBarInteractive() {
-  const [activeChart, setActiveChart] =
-    React.useState<keyof typeof chartConfig>("desktop");
+  const { data: statistics, isLoading } = useUserStatistics();
 
-  const total = React.useMemo(
-    () => ({
-      desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-      mobile: chartData.reduce((acc, curr) => acc + curr.mobile, 0),
-    }),
-    []
-  );
+  const chartData = React.useMemo(() => {
+    if (!statistics?.recent_activity) return [];
+    return statistics.recent_activity.map((activity) => ({
+      date: activity.date,
+      flashcards_reviewed: activity.flashcards_reviewed,
+      quizzes_completed: activity.quizzes_completed,
+    }));
+  }, [statistics]);
+
+  if (isLoading) {
+    return (
+      <Card className="justify-center p-5">
+        <CardHeader>
+          <CardTitle>Atividade de Estudos</CardTitle>
+          <CardDescription>Suas atividades nos últimos 7 dias</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[250px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!statistics || chartData.length === 0) {
+    return (
+      <Card className="justify-center p-5">
+        <CardHeader>
+          <CardTitle>Atividade de Estudos</CardTitle>
+          <CardDescription>Suas atividades nos últimos 7 dias</CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center h-[250px]">
+          <p className="text-sm text-muted-foreground">
+            Nenhuma atividade registrada ainda
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="justify-center p-5">
@@ -61,7 +80,7 @@ export function ChartBarInteractive() {
         <div className="sm:!py-0 flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3">
           <CardTitle>Atividade de Estudos</CardTitle>
           <CardDescription>
-            Revisão e precisão dos ultimos 7 dias
+            Suas atividades nos últimos 7 dias
           </CardDescription>
         </div>
       </CardHeader>
@@ -85,9 +104,9 @@ export function ChartBarInteractive() {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
+                return date.toLocaleDateString("pt-BR", {
                   day: "numeric",
+                  month: "short",
                 });
               }}
               tickLine={false}
@@ -96,19 +115,19 @@ export function ChartBarInteractive() {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  className="w-[150px]"
+                  className="w-[180px]"
                   labelFormatter={(value) =>
-                    new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
+                    new Date(value).toLocaleDateString("pt-BR", {
                       day: "numeric",
+                      month: "long",
                       year: "numeric",
                     })
                   }
-                  nameKey="views"
                 />
               }
             />
-            <Bar dataKey={activeChart} fill={`var(--color-${activeChart})`} />
+            <Bar dataKey="flashcards_reviewed" fill="var(--color-flashcards_reviewed)" />
+            <Bar dataKey="quizzes_completed" fill="var(--color-quizzes_completed)" />
           </BarChart>
         </ChartContainer>
       </CardContent>

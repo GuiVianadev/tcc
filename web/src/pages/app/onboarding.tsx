@@ -4,17 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/hooks/use-user";
+import { useUpsertStudyGoals } from "@/hooks/use-study-goals";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const studyGoalsSchema = z.object({
-  daily_goal_minutes: z.coerce.number().min(15, "Mínimo de 15 minutos").max(480, "Máximo de 8 horas"),
-  study_days_per_week: z.coerce.number().min(1, "Mínimo de 1 dia").max(7, "Máximo de 7 dias"),
-  preferred_study_time: z.enum(["morning", "afternoon", "evening", "night"]),
+  area_of_interest: z.string().min(1, "Área de interesse é obrigatória"),
+  daily_flashcards_goal: z.coerce.number().min(1, "Mínimo de 1 flashcard").max(200, "Máximo de 200 flashcards"),
+  daily_quizzes_goal: z.coerce.number().min(1, "Mínimo de 1 quiz").max(100, "Máximo de 100 quizzes"),
 });
 
 type StudyGoalsForm = z.infer<typeof studyGoalsSchema>;
@@ -22,10 +22,10 @@ type StudyGoalsForm = z.infer<typeof studyGoalsSchema>;
 /**
  * Página de onboarding para primeiro acesso
  *
- * Coleta preferências de estudo do usuário:
- * - Meta diária de estudo (minutos)
- * - Dias de estudo por semana
- * - Horário preferido de estudo
+ * Coleta metas de estudo do usuário:
+ * - Área de interesse
+ * - Meta diária de flashcards
+ * - Meta diária de quizzes
  *
  * Após conclusão, marca is_first_access = false e redireciona para dashboard.
  */
@@ -33,28 +33,25 @@ export function Onboarding() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { mutateAsync: updateProfile } = useUpdateProfile();
+  const { mutateAsync: upsertGoals } = useUpsertStudyGoals();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setValue,
-    watch,
   } = useForm<StudyGoalsForm>({
     resolver: zodResolver(studyGoalsSchema),
     defaultValues: {
-      daily_goal_minutes: 60,
-      study_days_per_week: 5,
-      preferred_study_time: "evening",
+      area_of_interest: "",
+      daily_flashcards_goal: 20,
+      daily_quizzes_goal: 10,
     },
   });
 
-  const preferredStudyTime = watch("preferred_study_time");
-
   async function handleCompleteOnboarding(data: StudyGoalsForm) {
     try {
-      // TODO: Salvar study goals no backend (criar endpoint)
-      console.log("Study goals:", data);
+      // Salvar metas de estudo
+      await upsertGoals(data);
 
       // Marca onboarding como completo
       await updateProfile({ is_first_access: false });
@@ -88,65 +85,54 @@ export function Onboarding() {
                 </p>
               </div>
 
-              {/* Meta diária */}
+              {/* Área de interesse */}
               <div className="space-y-2">
-                <Label htmlFor="daily_goal_minutes">
-                  Meta diária de estudo (minutos)
+                <Label htmlFor="area_of_interest">
+                  Área de interesse
                 </Label>
                 <Input
-                  id="daily_goal_minutes"
-                  type="number"
-                  min={15}
-                  max={480}
-                  {...register("daily_goal_minutes")}
-                  placeholder="60"
+                  id="area_of_interest"
+                  {...register("area_of_interest")}
+                  placeholder="Ex: Programação, Matemática, Inglês..."
                 />
                 <p className="text-muted-foreground text-xs">
-                  Quanto tempo você pretende estudar por dia?
+                  Qual área você está estudando?
                 </p>
               </div>
 
-              {/* Dias por semana */}
+              {/* Meta diária de flashcards */}
               <div className="space-y-2">
-                <Label htmlFor="study_days_per_week">
-                  Dias de estudo por semana
+                <Label htmlFor="daily_flashcards_goal">
+                  Meta diária de flashcards
                 </Label>
                 <Input
-                  id="study_days_per_week"
+                  id="daily_flashcards_goal"
                   type="number"
                   min={1}
-                  max={7}
-                  {...register("study_days_per_week")}
-                  placeholder="5"
+                  max={200}
+                  {...register("daily_flashcards_goal")}
+                  placeholder="20"
                 />
                 <p className="text-muted-foreground text-xs">
-                  Quantos dias por semana você planeja estudar?
+                  Quantos flashcards você deseja revisar por dia?
                 </p>
               </div>
 
-              {/* Horário preferido */}
+              {/* Meta diária de quizzes */}
               <div className="space-y-2">
-                <Label htmlFor="preferred_study_time">
-                  Horário preferido de estudo
+                <Label htmlFor="daily_quizzes_goal">
+                  Meta diária de quizzes
                 </Label>
-                <Select
-                  value={preferredStudyTime}
-                  onValueChange={(value) =>
-                    setValue("preferred_study_time", value as StudyGoalsForm["preferred_study_time"])
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um horário" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="morning">Manhã (6h - 12h)</SelectItem>
-                    <SelectItem value="afternoon">Tarde (12h - 18h)</SelectItem>
-                    <SelectItem value="evening">Noite (18h - 22h)</SelectItem>
-                    <SelectItem value="night">Madrugada (22h - 6h)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="daily_quizzes_goal"
+                  type="number"
+                  min={1}
+                  max={100}
+                  {...register("daily_quizzes_goal")}
+                  placeholder="10"
+                />
                 <p className="text-muted-foreground text-xs">
-                  Quando você costuma estudar melhor?
+                  Quantos quizzes você deseja completar por dia?
                 </p>
               </div>
 

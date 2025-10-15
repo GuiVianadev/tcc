@@ -7,6 +7,7 @@ import {
   type CreateMaterialFromTopicRequest,
   type CreateMaterialFromFileRequest,
   type GetMaterialsParams,
+  getRecentMaterials,
 } from "@/api/materials";
 
 /**
@@ -34,6 +35,14 @@ export function useMaterials(params: GetMaterialsParams = {}) {
   return useQuery({
     queryKey: ["materials", params],
     queryFn: () => getMaterials(params),
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
+}
+
+export function useRecentMaterials() {
+  return useQuery({
+    queryKey: ["recentMaterials"],
+    queryFn: () => getRecentMaterials(),
     staleTime: 1000 * 60 * 5, // 5 minutos
   });
 }

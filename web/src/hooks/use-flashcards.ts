@@ -19,6 +19,11 @@ export function useFlashcards(page = 1) {
 }
 
 /**
+ * Alias para useFlashcards (para compatibilidade)
+ */
+export const useAllFlashcards = useFlashcards;
+
+/**
  * Hook para listar flashcards que precisam ser revisados (vencidos)
  *
  * Ideal para mostrar no dashboard ou página de revisão diária
@@ -55,7 +60,7 @@ export function useFlashcardHistory(flashcardId: string) {
 }
 
 /**
- * Hook para revisar um flashcard (Sistema SRS - SM-2)
+ * Hook para revisar um flashcard (Sistema SRS)
  *
  * Exemplo de uso:
  * ```tsx
@@ -63,7 +68,7 @@ export function useFlashcardHistory(flashcardId: string) {
  *
  * mutate({
  *   flashcardId: "uuid",
- *   quality: 4 // 0-5 (0=não lembrou, 5=perfeito)
+ *   difficulty: "good" // "again" | "hard" | "good" | "easy"
  * });
  * ```
  */
@@ -73,11 +78,11 @@ export function useReviewFlashcard() {
   return useMutation({
     mutationFn: ({
       flashcardId,
-      quality,
+      difficulty,
     }: {
       flashcardId: string;
-      quality: ReviewFlashcardRequest["quality"];
-    }) => reviewFlashcard(flashcardId, { quality }),
+      difficulty: ReviewFlashcardRequest["difficulty"];
+    }) => reviewFlashcard(flashcardId, { difficulty }),
     onSuccess: (_, variables) => {
       // Invalida queries relacionadas para recarregar
       queryClient.invalidateQueries({ queryKey: ["flashcards"] });

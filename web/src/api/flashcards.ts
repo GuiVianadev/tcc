@@ -8,15 +8,15 @@ export type Flashcard = {
   answer: string;
   material_id: string;
   material_title?: string;
-  next_review: string;
-  easiness_factor: number;
-  interval: number;
-  repetitions: number;
+  next_review?: string; // Opcional na listagem
+  easiness_factor?: number; // Opcional na listagem
+  interval?: number; // Opcional na listagem
+  repetitions?: number; // Opcional na listagem
   created_at: string;
 };
 
 export type ReviewFlashcardRequest = {
-  quality: 0 | 1 | 2 | 3 | 4 | 5;
+  difficulty: "again" | "hard" | "good" | "easy";
 };
 
 export type ReviewFlashcardResponse = {
@@ -66,23 +66,20 @@ export async function getDueFlashcards() {
  * Busca flashcards de um material específico
  */
 export async function getMaterialFlashcards(materialId: string) {
-  const response = await api.get<GetFlashcardsResponse>(
+  const response = await api.get<{ flashcards: Flashcard[] }>(
     `/materials/${materialId}/flashcards`
   );
-
-  return response.data;
+  return response.data.flashcards;
 }
 
 /**
- * Revisa um flashcard usando o sistema SRS (SM-2)
+ * Revisa um flashcard usando o sistema SRS
  *
- * Escala de qualidade:
- * - 0: Blackout completo (não lembrou)
- * - 1: Resposta incorreta, mas reconheceu ao ver
- * - 2: Resposta incorreta, mas quase lembrou
- * - 3: Resposta correta com dificuldade
- * - 4: Resposta correta com hesitação
- * - 5: Resposta correta perfeita
+ * Dificuldade:
+ * - "again": Não lembrou, precisa revisar novamente em breve
+ * - "hard": Lembrou com muita dificuldade
+ * - "good": Lembrou corretamente
+ * - "easy": Lembrou facilmente
  */
 export async function reviewFlashcard(
   flashcardId: string,

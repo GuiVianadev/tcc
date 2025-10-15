@@ -1,6 +1,7 @@
 "use client";
 
 import { Legend, Pie, PieChart } from "recharts";
+import { useUserStatistics } from "@/hooks/use-statistics";
 
 import {
   Card,
@@ -16,45 +17,78 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Skeleton } from "./ui/skeleton";
 
 export const description = "A pie chart with a custom label";
-
-// Agora usamos rótulos reais no lugar de browsers
-const chartData = [
-  { label: "Fácil", value: 275, fill: "var(--chart-1)" },
-  { label: "Difícil", value: 200, fill: "var(--chart-2)" },
-  { label: "Bom", value: 187, fill: "var(--chart-3)" },
-  { label: "Novamente", value: 173, fill: "var(--chart-4)" },
-];
 
 const chartConfig = {
   value: {
     label: "Quantidade",
   },
-  facil: {
+  easy: {
     label: "Fácil",
     color: "var(--chart-1)",
   },
-  dificil: {
+  hard: {
     label: "Difícil",
     color: "var(--chart-2)",
   },
-  bom: {
+  good: {
     label: "Bom",
     color: "var(--chart-3)",
   },
-  novamente: {
-    label: "Novamente",
+  again: {
+    label: "Revisar",
     color: "var(--chart-4)",
   },
 } satisfies ChartConfig;
 
 export function ChartPieLabelCustom() {
+  const { data: statistics, isLoading } = useUserStatistics();
+
+  const chartData = statistics?.flashcard_stats?.difficulty_distribution
+    ? [
+      { label: "Fácil", value: statistics.flashcard_stats.difficulty_distribution.easy, fill: "var(--chart-1)" },
+      { label: "Bom", value: statistics.flashcard_stats.difficulty_distribution.good, fill: "var(--chart-3)" },
+      { label: "Difícil", value: statistics.flashcard_stats.difficulty_distribution.hard, fill: "var(--chart-2)" },
+      { label: "Revisar", value: statistics.flashcard_stats.difficulty_distribution.again, fill: "var(--chart-4)" },
+    ].filter(item => item.value > 0)
+    : [];
+  if (isLoading) {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Distribuição de Dificuldade</CardTitle>
+          <CardDescription>Como você avaliou seus flashcards</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0 flex items-center justify-center min-h-[300px]">
+          <Skeleton className="h-[250px] w-[250px] rounded-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!statistics || chartData.length === 0) {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Distribuição de Dificuldade</CardTitle>
+          <CardDescription>Como você avaliou seus flashcards</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0 flex items-center justify-center min-h-[300px]">
+          <p className="text-sm text-muted-foreground">
+            Nenhum flashcard revisado ainda
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Distribuição de Precisão</CardTitle>
-        <CardDescription>Como você avaliou seus cards</CardDescription>
+        <CardTitle>Distribuição de Dificuldade</CardTitle>
+        <CardDescription>Como você avaliou seus flashcards</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -76,7 +110,7 @@ export function ChartPieLabelCustom() {
                   x={props.x}
                   y={props.y}
                 >
-                  {payload.label} {/* <-- mostra Fácil, Difícil, etc */}
+                  {payload.label}
                 </text>
               )}
               labelLine={false}

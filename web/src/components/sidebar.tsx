@@ -6,6 +6,10 @@ import {
   LayoutDashboardIcon,
   Settings,
   User2,
+  FolderOpen,
+  BookOpen,
+  Brain,
+  ClipboardList,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/api/get-profile";
@@ -38,14 +42,24 @@ const items = [
     icon: LayoutDashboardIcon,
   },
   {
-    title: "Decks",
-    url: "decks",
-    icon: Inbox,
+    title: "Materiais",
+    url: "materials",
+    icon: FolderOpen,
   },
   {
-    title: "Simulados",
-    url: "simulados",
-    icon: Calendar,
+    title: "Resumos",
+    url: "summaries",
+    icon: BookOpen,
+  },
+  {
+    title: "Flashcards",
+    url: "flashcards",
+    icon: Brain,
+  },
+  {
+    title: "Quizzes",
+    url: "quizzes",
+    icon: ClipboardList,
   },
   {
     title: "Settings",

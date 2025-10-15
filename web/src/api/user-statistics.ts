@@ -8,6 +8,12 @@ export type FlashcardStats = {
   mastered_count: number;
   learning_count: number;
   new_count: number;
+  difficulty_distribution: {
+    again: number;
+    hard: number;
+    good: number;
+    easy: number;
+  };
 };
 
 export type QuizStats = {

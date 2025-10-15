@@ -23,6 +23,10 @@ export interface GetMaterialsParams {
   pageSize?: number;
 }
 
+export interface GetRecentMaterialsResponse {
+  materials: Material[]
+}
+
 export interface CreateMaterialFromTopicRequest {
   title: string;
   topic: string;
@@ -75,6 +79,13 @@ export async function getMaterials(
   const response = await api.get<PaginatedMaterialsResponse>("/materials", {
     params: { page, pageSize },
   });
+
+  return response.data;
+}
+
+export async function getRecentMaterials(
+): Promise<GetRecentMaterialsResponse> {
+  const response = await api.get<GetRecentMaterialsResponse>("/materials/recents");
 
   return response.data;
 }
