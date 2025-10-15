@@ -29,7 +29,7 @@ const aiResponseSchema = z.object({
   summary: z
     .string()
     .min(MIN_SUMMARY)
-    .max(MAX_SUMMARY * 2), // Aumentado para 2000 caracteres
+    .max(MAX_SUMMARY * 4), // Aumentado para 2000 caracteres
   flashcards: z.array(flashcardSchema).min(5).max(20),
   quizzes: z.array(quizSchema).min(10).max(15), // Limite do Gemini para evitar timeout
 });
@@ -151,6 +151,7 @@ Analise o conteúdo fornecido e gere:
    - Seja conciso mas completo
    - Use linguagem clara e objetiva
    - Organize em parágrafos lógicos
+   - Gere em formato markdown
 
 2. **${flashcardsQty} FLASHCARDS**:
    - Foque nos conceitos mais importantes

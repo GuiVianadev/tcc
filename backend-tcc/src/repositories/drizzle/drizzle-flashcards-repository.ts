@@ -1,4 +1,4 @@
-import { asc, desc, eq, lte, or, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lte, or } from "drizzle-orm";
 import { db } from "../../db/client.ts";
 import { flashcards, materials } from "../../db/schema.ts";
 import type {
@@ -7,6 +7,8 @@ import type {
   FlashcardsRepository,
   UpdateReviewData,
 } from "../flashcards-repository.ts";
+
+const LIMIT_CARDS_DUE = 50;
 
 export class DrizzleFlashcardsRepository implements FlashcardsRepository {
   async findByMaterialId(materialId: string): Promise<Flashcard[]> {
@@ -37,16 +39,13 @@ export class DrizzleFlashcardsRepository implements FlashcardsRepository {
       .select()
       .from(flashcards)
       .where(
-        eq(flashcards.user_id, userId)
-      )
-      .where(
-        or(
-          lte(flashcards.next_review, now),
-          isNull(flashcards.next_review)
+        and(
+          eq(flashcards.user_id, userId),
+          or(lte(flashcards.next_review, now), isNull(flashcards.next_review))
         )
       )
       .orderBy(asc(flashcards.next_review))
-      .limit(50)
+      .limit(LIMIT_CARDS_DUE)
       .execute();
 
     return dueCards;

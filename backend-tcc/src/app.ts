@@ -7,6 +7,7 @@ import { env } from "./env/index.ts";
 import { flashcardsRoutes } from "./http/controllers/flashcards/routes.ts";
 import { materialsRoutes } from "./http/controllers/materials/routes.ts";
 import { quizzesRoutes } from "./http/controllers/quizzes/routes.ts";
+import { studyGoalsRoutes } from "./http/controllers/study-goals/routes.ts";
 import { summariesRoutes } from "./http/controllers/summaries/routes.ts";
 import { userRoutes } from "./http/controllers/users/routes.ts";
 
@@ -45,3 +46,4 @@ app.register(materialsRoutes);
 app.register(summariesRoutes);
 app.register(quizzesRoutes);
 app.register(flashcardsRoutes);
+app.register(studyGoalsRoutes);

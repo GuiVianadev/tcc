@@ -1,15 +1,19 @@
 import {
   asc,
   count,
+  desc,
   eq,
   type InferInsertModel,
   type InferSelectModel,
 } from "drizzle-orm";
 import { db } from "../../db/client.ts";
 import { flashcards, materials, quizzes, summaries } from "../../db/schema.ts";
-import type { CreateMaterialWithContent, MaterialsRepository } from "../materials-repository.ts";
+import type {
+  CreateMaterialWithContent,
+  MaterialsRepository,
+} from "../materials-repository.ts";
 
-
+const RECENT_MATERIALS = 2;
 
 export class DrizzleMaterialsRepository implements MaterialsRepository {
   async create(
@@ -98,6 +102,18 @@ export class DrizzleMaterialsRepository implements MaterialsRepository {
       .orderBy(asc(materials.id))
       .limit(pageSize)
       .offset((page - 1) * pageSize);
+
+    return userMaterials;
+  }
+  async searchRecentsByUserId(
+    userId: string
+  ): Promise<InferSelectModel<typeof materials>[]> {
+    const userMaterials = await db
+      .select()
+      .from(materials)
+      .where(eq(materials.user_id, userId))
+      .orderBy(desc(materials.created_at))
+      .limit(RECENT_MATERIALS);
 
     return userMaterials;
   }
