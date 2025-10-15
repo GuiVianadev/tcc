@@ -3,7 +3,7 @@ import type { InferInsertModel } from "drizzle-orm";
 import type { users } from "@/db/schema.ts";
 import type { UserRepository } from "@/repositories/users-repository.ts";
 import { InvalidCredentialsError } from "../errors/invalid-credentials-error.ts";
-import { UserDisabledError } from "../errors/user-desativacted-errors.ts";
+import { UserDisabledError } from "../errors/user-desactived-errors.ts";
 
 type AutheticateServiceRequest = {
   email: string;
