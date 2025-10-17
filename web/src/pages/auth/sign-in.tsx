@@ -32,9 +32,11 @@ export function SignIn() {
     try {
       const user = await signIn(data.email, data.password);
 
-      // Redireciona baseado em primeiro acesso
+      // Redireciona baseado em primeiro acesso ou role
       if (user.is_first_access) {
         navigate("/onboarding");
+      } else if (user.role === "admin") {
+        navigate("/admin/users");
       } else {
         navigate("/dashboard");
       }

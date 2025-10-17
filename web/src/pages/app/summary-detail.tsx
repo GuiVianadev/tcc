@@ -46,7 +46,7 @@ export function SummaryDetail() {
               <p className="text-muted-foreground">
                 O resumo que você está procurando não existe ou foi removido
               </p>
-              <Button onClick={() => navigate("/summaries")}>
+              <Button onClick={() => navigate("/materials")}>
                 Voltar para Resumos
               </Button>
             </div>
@@ -64,7 +64,7 @@ export function SummaryDetail() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/summaries")}
+            onClick={() => navigate("/materials")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

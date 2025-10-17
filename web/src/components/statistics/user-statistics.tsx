@@ -189,7 +189,7 @@ export function UserStatistics() {
                 className="flex justify-between items-center py-2 border-b last:border-0"
               >
                 <span className="text-sm">
-                  {new Date(activity.date).toLocaleDateString("pt-BR", {
+                  {new Date(activity.date + 'T12:00:00').toLocaleDateString("pt-BR", {
                     weekday: "short",
                     day: "numeric",
                     month: "short",

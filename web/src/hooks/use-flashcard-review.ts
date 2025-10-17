@@ -7,6 +7,7 @@ interface ReviewSession {
   currentIndex: number;
   reviewedCount: number;
   isFlipped: boolean;
+  againQueue: Flashcard[]; // Fila de cards marcados como "again"
 }
 
 /**
@@ -43,6 +44,7 @@ export function useFlashcardReview(initialFlashcards: Flashcard[]) {
     currentIndex: 0,
     reviewedCount: 0,
     isFlipped: false,
+    againQueue: [],
   });
 
   // Atualizar sessão quando novos flashcards chegarem
@@ -53,6 +55,7 @@ export function useFlashcardReview(initialFlashcards: Flashcard[]) {
         currentIndex: 0,
         reviewedCount: 0,
         isFlipped: false,
+        againQueue: [],
       });
     }
   }, [initialFlashcards, session.flashcards.length]);
@@ -95,13 +98,55 @@ export function useFlashcardReview(initialFlashcards: Flashcard[]) {
           difficulty,
         });
 
-        // Avançar para o próximo card
-        setSession((prev) => ({
-          ...prev,
-          currentIndex: prev.currentIndex + 1,
-          reviewedCount: prev.reviewedCount + 1,
-          isFlipped: false, // Resetar flip para o próximo card
-        }));
+        setSession((prev) => {
+          const isLastCard = prev.currentIndex >= prev.flashcards.length - 1;
+
+          // Se marcou como "again", adiciona na fila para revisar novamente
+          if (difficulty === "again") {
+            // Adiciona o card na fila de "again"
+            const newAgainQueue = [...prev.againQueue, currentFlashcard];
+
+            // Se for o último card da lista principal, começa a processar a fila "again"
+            if (isLastCard && newAgainQueue.length > 0) {
+              return {
+                ...prev,
+                flashcards: [...prev.flashcards, ...newAgainQueue],
+                currentIndex: prev.currentIndex + 1,
+                reviewedCount: prev.reviewedCount + 1,
+                isFlipped: false,
+                againQueue: [], // Limpa a fila pois já adicionou nos flashcards
+              };
+            }
+
+            return {
+              ...prev,
+              currentIndex: prev.currentIndex + 1,
+              reviewedCount: prev.reviewedCount + 1,
+              isFlipped: false,
+              againQueue: newAgainQueue,
+            };
+          }
+
+          // Para outras dificuldades, apenas avança
+          // Se for o último card e ainda tem cards na fila "again", adiciona eles
+          if (isLastCard && prev.againQueue.length > 0) {
+            return {
+              ...prev,
+              flashcards: [...prev.flashcards, ...prev.againQueue],
+              currentIndex: prev.currentIndex + 1,
+              reviewedCount: prev.reviewedCount + 1,
+              isFlipped: false,
+              againQueue: [],
+            };
+          }
+
+          return {
+            ...prev,
+            currentIndex: prev.currentIndex + 1,
+            reviewedCount: prev.reviewedCount + 1,
+            isFlipped: false,
+          };
+        });
       } catch (error) {
         console.error("Erro ao revisar flashcard:", error);
       }
@@ -116,6 +161,7 @@ export function useFlashcardReview(initialFlashcards: Flashcard[]) {
       currentIndex: 0,
       reviewedCount: 0,
       isFlipped: false,
+      againQueue: [],
     });
   }, [initialFlashcards]);
 
@@ -126,6 +172,7 @@ export function useFlashcardReview(initialFlashcards: Flashcard[]) {
     hasNextCard,
     isSessionComplete,
     isReviewing: reviewMutation.isPending,
+    againQueueCount: session.againQueue.length,
     flipCard,
     submitReview,
     resetSession,

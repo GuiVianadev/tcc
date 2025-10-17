@@ -162,9 +162,9 @@ export function Materials() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="gap-1"
                         onClick={() => navigate(`/summaries/${material.id}`)}
                       >
-                        <BookOpen className="mr-1 h-4 w-4" />
                         Resumo
                       </Button>
                       <Button
@@ -172,7 +172,6 @@ export function Materials() {
                         size="sm"
                         onClick={() => navigate(`/materials/${material.id}/flashcards`)}
                       >
-                        <Brain className="mr-1 h-4 w-4" />
                         Cards
                       </Button>
                       <Button
@@ -180,7 +179,6 @@ export function Materials() {
                         size="sm"
                         onClick={() => navigate(`/materials/${material.id}/quizzes`)}
                       >
-                        <ClipboardList className="mr-1 h-4 w-4" />
                         Quizzes
                       </Button>
                     </div>

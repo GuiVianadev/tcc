@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteUser, getUsers, type GetUsersParams } from "@/api/admin";
+import { deleteUser, getUsers, reactivateUser, type GetUsersParams } from "@/api/admin";
 
 /**
  * Hook para listar usuários (admin only)
@@ -56,6 +56,17 @@ export function useDeleteUser() {
 
   return useMutation({
     mutationFn: deleteUser,
+    onSuccess: () => {
+      // Invalida todas as queries de usuários para forçar refetch
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+  });
+}
+export function useReactivateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: reactivateUser,
     onSuccess: () => {
       // Invalida todas as queries de usuários para forçar refetch
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });

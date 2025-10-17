@@ -62,3 +62,8 @@ export async function deleteUser(targetUserId: string): Promise<void> {
     data: { targetUserId },
   });
 }
+export async function reactivateUser(targetUserId: string): Promise<void> {
+  await api.patch("/users/reactivate", {
+    targetUserId,
+  });
+}

@@ -1,16 +1,11 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Calendar,
   ChevronUp,
-  Inbox,
   LayoutDashboardIcon,
-  Settings,
+
   User2,
-  FolderOpen,
-  BookOpen,
-  Brain,
-  ClipboardList,
-  Trophy,
+  Users,
+
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/api/get-profile";
@@ -38,34 +33,14 @@ import { Skeleton } from "./ui/skeleton";
 
 const items = [
   {
-    title: "Dashboard",
-    url: "",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Materiais",
-    url: "materials",
-    icon: FolderOpen,
+    title: "Usuarios",
+    url: "/admin/users",
+    icon: Users,
   },
 
-  {
-    title: "Calendário",
-    url: "calendar",
-    icon: Calendar,
-  },
-  {
-    title: "Ranking",
-    url: "ranking",
-    icon: Trophy,
-  },
-  {
-    title: "Configurações",
-    url: "settings",
-    icon: Settings,
-  },
 ];
 
-export function AppSidebar() {
+export function AdminSidebar() {
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: getCurrentUser,

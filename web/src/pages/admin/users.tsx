@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAdminUsers, useDeleteUser } from "@/hooks/use-admin";
+import { useAdminUsers, useDeleteUser, useReactivateUser } from "@/hooks/use-admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -38,19 +38,33 @@ import type { PublicUser } from "@/api/admin";
 export function AdminUsers() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [userToDelete, setUserToDelete] = useState<PublicUser | null>(null);
+  const [actionType, setActionType] = useState<"delete" | "reactivate" | null>(null);
+  const [selectedUser, setSelectedUser] = useState<PublicUser | null>(null);
 
   const { data, isLoading, error } = useAdminUsers({ page, pageSize });
   const { mutateAsync: deleteUserMutation, isPending: isDeleting } = useDeleteUser();
+  const { mutateAsync: reactivateUserMutation, isPending: isReactvating } = useReactivateUser();
 
   async function handleDeleteUser() {
-    if (!userToDelete) return;
+    if (!selectedUser) return;
 
     try {
-      await deleteUserMutation(userToDelete.id);
-      setUserToDelete(null);
+      await deleteUserMutation(selectedUser.id);
+      setSelectedUser(null);
+      setActionType(null);
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
+    }
+  }
+  async function handleReactivateUser() {
+    if (!selectedUser) return;
+
+    try {
+      await reactivateUserMutation(selectedUser.id);
+      setSelectedUser(null);
+      setActionType(null);
+    } catch (error) {
+      console.error("Erro ao reativar usuário:", error);
     }
   }
 
@@ -145,11 +159,29 @@ export function AdminUsers() {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => setUserToDelete(user)}
+                                onClick={() => {
+                                  setActionType('delete')
+                                  setSelectedUser(user)
+                                }}
                               >
                                 Desativar
                               </Button>
                             )}
+                            {user.deleted_at && (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                className="w-22 bg-green-700 dark:text-white "
+                                onClick={() => {
+                                  setSelectedUser(user);
+                                  setActionType('reactivate')
+                                }}
+                                disabled={isReactvating}
+                              >
+                                Ativar
+                              </Button>
+                            )}
+
                           </TableCell>
                         </TableRow>
                       ))
@@ -187,24 +219,39 @@ export function AdminUsers() {
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!selectedUser} onOpenChange={() => {
+        setSelectedUser(null);
+        setActionType(null);
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Você está prestes a desativar o usuário <strong>{userToDelete?.name}</strong>.
-              Esta ação irá realizar um soft delete, o usuário não será removido permanentemente.
+              {actionType === 'delete' ? (
+                <>
+                  Você está prestes a desativar o usuário <strong>{selectedUser?.name}</strong>.
+                  Esta ação irá realizar um soft delete, o usuário não será removido permanentemente.
+                </>
+              ) : (
+                <>
+                  Você está prestes a reativar o usuário <strong>{selectedUser?.name}</strong>.
+                  O usuário poderá acessar a plataforma novamente.
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting || isReactvating}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteUser}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+              onClick={actionType === 'delete' ? handleDeleteUser : handleReactivateUser}
+              disabled={isDeleting || isReactvating}
+              className={actionType === 'delete' ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
             >
-              {isDeleting ? "Desativando..." : "Desativar usuário"}
+              {actionType === 'delete'
+                ? (isDeleting ? "Desativando..." : "Desativar usuário")
+                : (isReactvating ? "Reativando..." : "Reativar usuário")
+              }
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

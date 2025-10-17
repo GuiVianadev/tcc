@@ -13,14 +13,26 @@ import { getStudyGoals, updateStudyGoals } from "@/api/study-goals";
 
 
 const MIN_PASSWORD = 8;
-const MIN_USERNAME = 3;
+const MIN_NAME = 2;
 
 
 const updateUserForm = z.object({
   email: z.email("Email inválido").optional(),
-  name: z.string().min(MIN_USERNAME, "Mínimo 3 caracteres").optional(),
-  password: z.string().min(MIN_PASSWORD, "Mínimo 8 caracteres").optional(),
+  firstName: z.string().min(MIN_NAME, "Nome deve ter no mínimo 2 caracteres").optional().or(z.literal('')),
+  lastName: z.string().min(MIN_NAME, "Sobrenome deve ter no mínimo 2 caracteres").optional().or(z.literal('')),
+  password: z.string().min(MIN_PASSWORD, "Senha deve ter no mínimo 8 caracteres").optional().or(z.literal('')),
+  confirmPassword: z.string().optional().or(z.literal('')),
+}).refine((data) => {
+  // Se senha foi preenchida, confirmPassword deve ser igual
+  if (data.password && data.password.length > 0 && data.password !== "********") {
+    return data.password === data.confirmPassword;
+  }
+  return true;
+}, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
+
 type UpdateUserForm = z.infer<typeof updateUserForm>
 
 const studyGoalsSchema = z.object({
@@ -42,12 +54,17 @@ export function Settings() {
     queryFn: getStudyGoals,
   });
 
+  // Separar nome completo em firstName e lastName
+  const nameParts = profile?.user.name?.split(' ') || [];
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+
   const { register: registerUser, handleSubmit: userHandleSubmit, formState: { isSubmitting: userSubmitting, errors: userError } } = useForm<UpdateUserForm>({
     resolver: zodResolver(updateUserForm),
     values: {
       email: profile?.user.email,
-      name: profile?.user.name,
-      password: "********"
+      firstName: firstName,
+      lastName: lastName,
     }
   })
 
@@ -70,10 +87,17 @@ export function Settings() {
 
   async function handleUserUpdate(data: UpdateUserForm) {
     try {
+      // Concatena firstName e lastName se foram fornecidos
+      let fullName = undefined;
+      if (data.firstName && data.lastName) {
+        fullName = `${data.firstName} ${data.lastName}`;
+      }
+
+      // Não envia senha se for o placeholder
+
       await updateUser({
         email: data?.email,
-        name: data?.name,
-        password: data?.password
+        name: fullName,
       })
     }
     catch (error) {
@@ -128,19 +152,42 @@ export function Settings() {
                   {...registerUser("email")}
                   placeholder="Atualize seu email"
                 />
-                <Label htmlFor="name">Nome</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  {...registerUser("name")}
-                  placeholder="Atualize seu nome"
-                />
-                <Label htmlFor="password">Senha</Label>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="firstName">Nome</Label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      {...registerUser("firstName")}
+                      placeholder="Ex: João"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Sobrenome</Label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      {...registerUser("lastName")}
+                      placeholder="Ex: Silva"
+                    />
+                  </div>
+                </div>
+
+                <Label htmlFor="password">Nova senha (deixe em branco para não alterar)</Label>
                 <Input
                   id="password"
                   type="password"
                   {...registerUser("password")}
-                  placeholder="Atualize sua senha"
+                  placeholder="Digite uma nova senha"
+                />
+
+                <Label htmlFor="confirmPassword">Confirmar nova senha</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  {...registerUser("confirmPassword")}
+                  placeholder="Confirme a nova senha"
                 />
               </div>
 

@@ -25,6 +25,10 @@ export function PublicRoute({ children }: PublicRouteProps) {
     if (user.is_first_access) {
       return <Navigate to="/onboarding" replace />;
     }
+    // Se é admin, redireciona para área administrativa
+    if (user.role === "admin") {
+      return <Navigate to="/admin/users" replace />;
+    }
     // Caso contrário, redireciona para dashboard
     return <Navigate to="/dashboard" replace />;
   }

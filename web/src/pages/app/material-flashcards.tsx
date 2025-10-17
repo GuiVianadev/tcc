@@ -31,6 +31,7 @@ export function MaterialFlashcards() {
     progress,
     isSessionComplete,
     isReviewing,
+    againQueueCount,
     flipCard,
     submitReview,
   } = useFlashcardReview(flashcards || []);
@@ -174,6 +175,12 @@ export function MaterialFlashcards() {
               </span>
             </div>
             <Progress value={progress.percentage} />
+            {againQueueCount > 0 && (
+              <div className="flex items-center gap-2 text-xs text-orange-600 dark:text-orange-400 pt-1">
+                <span className="font-semibold">{againQueueCount}</span>
+                <span>card{againQueueCount > 1 ? 's' : ''} para revisar novamente</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -1,8 +1,9 @@
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState, useRef } from "react";
 import { signIn as signInApi } from "@/api/sign-in";
 import { signUp as signUpApi } from "@/api/sign-up";
 import { logout as logoutApi } from "@/api/logout";
 import { getCurrentUser } from "@/api/get-profile";
+import { refreshToken } from "@/api/refresh-token";
 
 // ========== TYPES ==========
 
@@ -20,7 +21,7 @@ type AuthContextData = {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<User>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -39,6 +40,7 @@ export const AuthContext = createContext<AuthContextData>({} as AuthContextData)
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const isAuthenticated = !!user;
 
@@ -124,8 +126,50 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Erro ao fazer logout:", error);
     } finally {
       setUser(null);
+
+      // Limpa o intervalo de refresh ao fazer logout
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
     }
   }, []);
+
+  /**
+   * Inicia o refresh automático do token
+   * Renova o token a cada 8 minutos (antes do token expirar em 10 minutos)
+   */
+  const setupTokenRefresh = useCallback(() => {
+    // Limpa qualquer intervalo existente
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current);
+    }
+
+    // Configura novo intervalo para renovar o token a cada 8 minutos
+    refreshIntervalRef.current = setInterval(async () => {
+      try {
+        const token = localStorage.getItem("@cognitio:token");
+
+        if (!token) {
+          // Se não há token, limpa o intervalo
+          if (refreshIntervalRef.current) {
+            clearInterval(refreshIntervalRef.current);
+            refreshIntervalRef.current = null;
+          }
+          return;
+        }
+
+        console.log("[Auth] Renovando token automaticamente...");
+        await refreshToken();
+        console.log("[Auth] Token renovado com sucesso");
+      } catch (error) {
+        console.error("[Auth] Erro ao renovar token automaticamente:", error);
+
+        // Se falhar ao renovar, faz logout
+        await logout();
+      }
+    }, 8 * 60 * 1000); // 8 minutos em milissegundos
+  }, [logout]);
 
   /**
    * Carrega o usuário ao montar o componente
@@ -133,6 +177,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     loadUser();
   }, [loadUser]);
+
+  /**
+   * Inicia o refresh automático quando o usuário está autenticado
+   * e limpa quando o usuário faz logout
+   */
+  useEffect(() => {
+    if (isAuthenticated) {
+      setupTokenRefresh();
+    } else {
+      // Limpa o intervalo se o usuário não está autenticado
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+    }
+
+    // Cleanup ao desmontar o componente
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
+    };
+  }, [isAuthenticated, setupTokenRefresh]);
 
   return (
     <AuthContext.Provider

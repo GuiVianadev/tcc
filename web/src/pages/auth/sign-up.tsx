@@ -10,12 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const MIN_PASSWORD = 8;
-const MIN_USERNAME = 3;
+const MIN_NAME = 2;
 
 const signUpForm = z.object({
   email: z.email("Email inválido"),
-  name: z.string().min(MIN_USERNAME, "Mínimo 3 caracteres"),
-  password: z.string().min(MIN_PASSWORD, "Mínimo 8 caracteres"),
+  firstName: z.string().min(MIN_NAME, "Nome deve ter no mínimo 2 caracteres"),
+  lastName: z.string().min(MIN_NAME, "Sobrenome deve ter no mínimo 2 caracteres"),
+  password: z.string().min(MIN_PASSWORD, "Senha deve ter no mínimo 8 caracteres"),
+  confirmPassword: z.string().min(MIN_PASSWORD, "Confirmação de senha obrigatória"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
 type SignUpForm = z.infer<typeof signUpForm>;
@@ -40,9 +45,12 @@ export function SignUp() {
 
   async function handleSignUp(data: SignUpForm) {
     try {
+      // Concatena firstName e lastName para enviar como name
+      const fullName = `${data.firstName} ${data.lastName}`;
+
       await registerAccount({
         email: data.email,
-        name: data.name,
+        name: fullName,
         password: data.password,
       });
     } catch (error) {
@@ -82,19 +90,42 @@ export function SignUp() {
             {...register("email")}
             placeholder="Digite seu email"
           />
-          <Label htmlFor="fullname">Nome completo</Label>
-          <Input
-            id="name"
-            type="text"
-            {...register("name")}
-            placeholder="Digite seu nome completo"
-          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="firstName">Nome</Label>
+              <Input
+                id="firstName"
+                type="text"
+                {...register("firstName")}
+                placeholder="Ex: João"
+              />
+            </div>
+            <div>
+              <Label htmlFor="lastName">Sobrenome</Label>
+              <Input
+                id="lastName"
+                type="text"
+                {...register("lastName")}
+                placeholder="Ex: Silva"
+              />
+            </div>
+          </div>
+
           <Label htmlFor="password">Senha</Label>
           <Input
             id="password"
             type="password"
             {...register("password")}
-            placeholder="Deve ter no mínimo 8 caracteres"
+            placeholder="Mínimo 8 caracteres"
+          />
+
+          <Label htmlFor="confirmPassword">Confirmar senha</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            {...register("confirmPassword")}
+            placeholder="Digite a senha novamente"
           />
         </div>
 

@@ -12,6 +12,8 @@ import { FlashcardReview } from "./pages/app/flashcard-review";
 import { MaterialFlashcards } from "./pages/app/material-flashcards";
 import { Quizzes } from "./pages/app/quizzes";
 import { MaterialQuizzes } from "./pages/app/material-quizzes";
+import { StudyCalendar } from "./pages/app/study-calendar";
+import { Ranking } from "./pages/app/ranking";
 import { SignIn } from "./pages/auth/sign-in";
 import { SignUp } from "./pages/auth/sign-up";
 import { ProtectedRoute } from "./components/protectedRoute";
@@ -20,6 +22,7 @@ import { OnboardingGuard } from "./components/guards/OnboardingGuard";
 import { AdminGuard } from "./components/guards/AdminGuard";
 import { Onboarding } from "./pages/app/onboarding";
 import { AdminUsers } from "./pages/admin/users";
+import { AdminLayout } from "./pages/_layouts/admin";
 
 export const router = createBrowserRouter([
   // Rotas protegidas (requerem autenticação + onboarding completo)
@@ -44,6 +47,8 @@ export const router = createBrowserRouter([
       { path: "/flashcards", Component: Flashcards },
       { path: "/flashcards/review", Component: FlashcardReview },
       { path: "/quizzes", Component: Quizzes },
+      { path: "/calendar", Component: StudyCalendar },
+      { path: "/ranking", Component: Ranking },
       { path: "/settings", Component: Settings },
     ],
   },
@@ -58,12 +63,12 @@ export const router = createBrowserRouter([
   },
   // Rotas de administração (requerem autenticação + role admin)
   {
-    path: "/admin",
+    path: "/admin/users",
     element: (
       <ProtectedRoute>
         <OnboardingGuard>
           <AdminGuard>
-            <AppLayout />
+            <AdminLayout />
           </AdminGuard>
         </OnboardingGuard>
       </ProtectedRoute>
