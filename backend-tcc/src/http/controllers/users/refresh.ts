@@ -7,7 +7,7 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
 
   const token = await reply.jwtSign(
     {
-      role: request.user,
+      role: request.user.role,
     },
     {
       sign: {
@@ -17,7 +17,7 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
   );
   const refreshToken = await reply.jwtSign(
     {
-      role: request.user,
+      role: request.user.role,
     },
     {
       sign: {

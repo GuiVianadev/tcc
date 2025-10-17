@@ -4,6 +4,7 @@ import { users } from "../../db/schema.ts";
 import type { UserRepository } from "../users-repository.ts";
 
 export class DrizzleUsersRepository implements UserRepository {
+
   async create(data: InferInsertModel<typeof users>) {
     const [user] = await db.insert(users).values(data).returning();
     return user;
@@ -45,7 +46,6 @@ export class DrizzleUsersRepository implements UserRepository {
         deleted_at: users.deleted_at,
       })
       .from(users)
-      .where(isNull(users.deleted_at))
       .limit(pageSize)
       .offset(offset)
       .orderBy(users.created_at);
@@ -53,7 +53,6 @@ export class DrizzleUsersRepository implements UserRepository {
     const [{ total }] = await db
       .select({ total: count() })
       .from(users)
-      .where(isNull(users.deleted_at));
 
     return {
       users: usersList,
@@ -67,6 +66,16 @@ export class DrizzleUsersRepository implements UserRepository {
     const result = await db
       .update(users)
       .set({ deleted_at: new Date() })
+      .where(eq(users.id, id))
+      .returning({ id: users.id });
+
+    return result.length > 0;
+  }
+
+  async reactivateUser(id: string): Promise<boolean> {
+    const result = await db
+      .update(users)
+      .set({ deleted_at: null })
       .where(eq(users.id, id))
       .returning({ id: users.id });
 

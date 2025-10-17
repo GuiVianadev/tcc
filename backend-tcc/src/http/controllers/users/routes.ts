@@ -10,6 +10,8 @@ import { register } from "./register.ts";
 import { update } from "./update.ts";
 import { getUsers } from "./get-users.ts";
 import { getUserStatistics } from "./get-user-statistics.controller.ts";
+import { getUsersRanking } from "./get-users-ranking.controller.ts";
+import { reactivateUser } from "./reactivate.ts";
 
 // biome-ignore lint/suspicious/useAwait: This code need be async but without await
 export async function userRoutes(app: FastifyInstance) {
@@ -21,8 +23,10 @@ export async function userRoutes(app: FastifyInstance) {
 
   app.get("/me", { onRequest: [verifyJWT] }, profile);
   app.get("/users/me/statistics", { onRequest: [verifyJWT] }, getUserStatistics);
-  app.delete("/users/delete", { onRequest: [verifyJWT] }, deleteUser);
+  app.get("/users/ranking/streak", { onRequest: [verifyJWT] }, getUsersRanking);
   app.patch("/user/update", { onRequest: [verifyJWT] }, update);
+  app.delete("/users/delete", { onRequest: [verifyJWT] }, deleteUser);
+  app.patch("/users/reactivate", { onRequest: [verifyJWT, verifyUserRole("admin")] }, reactivateUser);
 
   app.get("/users", { onRequest: [verifyJWT, verifyUserRole("admin")] }, getUsers);
 }

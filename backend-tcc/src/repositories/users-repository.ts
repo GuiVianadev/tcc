@@ -24,4 +24,5 @@ export type UserRepository = {
   findById(id: string): Promise<InferSelectModel<typeof users> | null>;
   findUsers(page: number, pageSize: number): Promise<PaginatedUsers>;
   deleteUser(id: string): Promise<boolean>;
+  reactivateUser(id: string): Promise<boolean>;
 };

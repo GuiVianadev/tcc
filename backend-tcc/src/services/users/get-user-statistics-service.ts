@@ -53,15 +53,37 @@ export class GetUserStatisticsService {
   async execute({
     userId,
   }: GetUserStatisticsRequest): Promise<GetUserStatisticsResponse> {
-    // Início e fim do dia atual (UTC)
+    // Calcular início e fim do dia de HOJE no timezone do Brasil (UTC-3)
+    // Independente do timezone do servidor ou PostgreSQL
     const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
-    const endOfToday = new Date(startOfToday);
-    endOfToday.setDate(endOfToday.getDate() + 1);
+    const brasilOffsetMs = -3 * 60 * 60 * 1000; // UTC-3 em milissegundos
+
+    // Converter "agora" para o horário do Brasil
+    const nowBrasil = new Date(now.getTime() + brasilOffsetMs);
+
+    // Pegar apenas a data (sem hora) no Brasil
+    const year = nowBrasil.getUTCFullYear();
+    const month = nowBrasil.getUTCMonth();
+    const day = nowBrasil.getUTCDate();
+
+    // Criar início do dia no Brasil (00:00:00 BRT)
+    const startOfDayBrasil = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+    const startOfDayUTC = new Date(startOfDayBrasil.getTime() - brasilOffsetMs);
+
+    // Criar fim do dia no Brasil (23:59:59.999 BRT)
+    const endOfDayBrasil = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
+    const endOfDayUTC = new Date(endOfDayBrasil.getTime() - brasilOffsetMs);
+
+    const todayBrasil = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+    // DEBUG - Remover depois
+    console.log('=== DEBUG TIMEZONE ===');
+    console.log('Agora UTC:', now.toISOString());
+    console.log('Agora Brasil:', nowBrasil.toISOString());
+    console.log('Data Brasil:', todayBrasil);
+    console.log('Início do dia UTC:', startOfDayUTC.toISOString());
+    console.log('Fim do dia UTC:', endOfDayUTC.toISOString());
+    console.log('====================');
 
     // 1. Total de materiais do usuário
     const materialsCount = await db
@@ -87,38 +109,41 @@ export class GetUserStatisticsService {
       .execute();
     const totalQuizzes = quizzesCount[0]?.total || 0;
 
-    // 4. Flashcards revisados hoje
+    // 4. Flashcards revisados hoje (comparando com timestamps UTC calculados)
     const flashcardsToday = await db
       .select({ total: count() })
       .from(flashcard_reviews)
       .where(
         and(
           eq(flashcard_reviews.user_id, userId),
-          gte(flashcard_reviews.reviewed_at, startOfToday),
-          lte(flashcard_reviews.reviewed_at, endOfToday)
+          gte(flashcard_reviews.reviewed_at, startOfDayUTC),
+          lte(flashcard_reviews.reviewed_at, endOfDayUTC)
         )
       )
       .execute();
     const flashcardsReviewedToday = flashcardsToday[0]?.total || 0;
+    console.log('Flashcards revisados hoje:', flashcardsReviewedToday);
 
-    // 5. Quizzes respondidos hoje
+    // 5. Quizzes respondidos hoje (comparando com timestamps UTC calculados)
     const quizzesToday = await db
       .select({ total: count() })
       .from(quiz_attempts)
       .where(
         and(
           eq(quiz_attempts.user_id, userId),
-          gte(quiz_attempts.attempted_at, startOfToday),
-          lte(quiz_attempts.attempted_at, endOfToday)
+          gte(quiz_attempts.attempted_at, startOfDayUTC),
+          lte(quiz_attempts.attempted_at, endOfDayUTC)
         )
       )
       .execute();
     const quizzesCompletedToday = quizzesToday[0]?.total || 0;
+    console.log('Quizzes completados hoje:', quizzesCompletedToday);
 
     // 6. Total de dias únicos com atividade
+    // Usar timezone América/São_Paulo para conversão correta
     const uniqueStudyDays = await db
       .selectDistinct({
-        date: sql<string>`DATE(${flashcard_reviews.reviewed_at})`,
+        date: sql<string>`DATE(${flashcard_reviews.reviewed_at} AT TIME ZONE 'America/Sao_Paulo')`,
       })
       .from(flashcard_reviews)
       .where(eq(flashcard_reviews.user_id, userId))
@@ -126,7 +151,7 @@ export class GetUserStatisticsService {
     const totalStudyDays = uniqueStudyDays.length;
 
     // 7. Calcular streak (dias consecutivos)
-    const currentStreak = await this.calculateStreak(userId);
+    const currentStreak = await this.calculateStreak(userId, todayBrasil);
 
     // 8. Estatísticas detalhadas de flashcards
     const flashcardReviewsData = await db
@@ -217,14 +242,14 @@ export class GetUserStatisticsService {
     };
   }
 
-  private async calculateStreak(userId: string): Promise<number> {
+  private async calculateStreak(userId: string, todayBrasil: string): Promise<number> {
     // Buscar últimos 60 dias de atividade de flashcards
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
     const flashcardDays = await db
       .select({
-        date: sql<string>`DATE(${flashcard_reviews.reviewed_at})`,
+        date: sql<string>`to_char(${flashcard_reviews.reviewed_at} AT TIME ZONE 'UTC' - INTERVAL '3 hours', 'YYYY-MM-DD')`,
       })
       .from(flashcard_reviews)
       .where(
@@ -233,13 +258,13 @@ export class GetUserStatisticsService {
           gte(flashcard_reviews.reviewed_at, sixtyDaysAgo)
         )
       )
-      .groupBy(sql`DATE(${flashcard_reviews.reviewed_at})`)
+      .groupBy(sql`to_char(${flashcard_reviews.reviewed_at} AT TIME ZONE 'UTC' - INTERVAL '3 hours', 'YYYY-MM-DD')`)
       .execute();
 
     // Buscar últimos 60 dias de atividade de quizzes
     const quizDays = await db
       .select({
-        date: sql<string>`DATE(${quiz_attempts.attempted_at})`,
+        date: sql<string>`to_char(${quiz_attempts.attempted_at} AT TIME ZONE 'UTC' - INTERVAL '3 hours', 'YYYY-MM-DD')`,
       })
       .from(quiz_attempts)
       .where(
@@ -248,7 +273,7 @@ export class GetUserStatisticsService {
           gte(quiz_attempts.attempted_at, sixtyDaysAgo)
         )
       )
-      .groupBy(sql`DATE(${quiz_attempts.attempted_at})`)
+      .groupBy(sql`to_char(${quiz_attempts.attempted_at} AT TIME ZONE 'UTC' - INTERVAL '3 hours', 'YYYY-MM-DD')`)
       .execute();
 
     // Combinar todos os dias únicos de atividade
@@ -262,21 +287,46 @@ export class GetUserStatisticsService {
 
     if (allActivityDates.size === 0) return 0;
 
-    // Converter Set para Array e ordenar (mais recente primeiro)
-    const sortedDates = Array.from(allActivityDates).sort((a, b) =>
-      b.localeCompare(a)
-    );
+    // Parsear todayBrasil para calcular os dias anteriores
+    const [yearStr, monthStr, dayStr] = todayBrasil.split('-');
+    const year = parseInt(yearStr);
+    const month = parseInt(monthStr) - 1; // JavaScript months are 0-indexed
+    const day = parseInt(dayStr);
 
-    // Calcular streak consecutivo começando de hoje
+    // Verificar se tem atividade hoje
+    const hasActivityToday = allActivityDates.has(todayBrasil);
+
+    // Se não tem atividade hoje, verificar se tem atividade ontem
+    // Se sim, o streak continua (só começa de ontem)
+    // Se não, o streak está quebrado
+    let startDay = 0;
+
+    if (hasActivityToday) {
+      // Tem atividade hoje, streak começa de hoje
+      startDay = 0;
+    } else {
+      // Não tem atividade hoje, verificar ontem
+      const yesterday = new Date(year, month, day);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+      if (allActivityDates.has(yesterdayStr)) {
+        // Tem atividade ontem, streak continua mas começa de ontem
+        startDay = 1;
+      } else {
+        // Não tem atividade nem hoje nem ontem, streak quebrado
+        return 0;
+      }
+    }
+
+    // Calcular streak consecutivo
     let streak = 0;
-    const today = new Date();
-    const todayStr = today.toISOString().split("T")[0]; // YYYY-MM-DD
 
-    // Iterar dia por dia começando de hoje
-    for (let i = 0; i < 60; i++) {
-      const checkDate = new Date(today);
-      checkDate.setDate(today.getDate() - i);
-      const checkDateStr = checkDate.toISOString().split("T")[0];
+    // Iterar dia por dia começando do dia inicial calculado
+    for (let i = startDay; i < 60; i++) {
+      const checkDate = new Date(year, month, day);
+      checkDate.setDate(checkDate.getDate() - i);
+      const checkDateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
 
       if (allActivityDates.has(checkDateStr)) {
         streak++;
@@ -299,7 +349,7 @@ export class GetUserStatisticsService {
     // Atividade de flashcards por dia
     const flashcardActivity = await db
       .select({
-        date: sql<string>`DATE(${flashcard_reviews.reviewed_at})`,
+        date: sql<string>`DATE(${flashcard_reviews.reviewed_at} AT TIME ZONE 'America/Sao_Paulo')`,
         count: count(),
       })
       .from(flashcard_reviews)
@@ -309,13 +359,13 @@ export class GetUserStatisticsService {
           gte(flashcard_reviews.reviewed_at, startDate)
         )
       )
-      .groupBy(sql`DATE(${flashcard_reviews.reviewed_at})`)
+      .groupBy(sql`DATE(${flashcard_reviews.reviewed_at} AT TIME ZONE 'America/Sao_Paulo')`)
       .execute();
 
     // Atividade de quizzes por dia
     const quizActivity = await db
       .select({
-        date: sql<string>`DATE(${quiz_attempts.attempted_at})`,
+        date: sql<string>`DATE(${quiz_attempts.attempted_at} AT TIME ZONE 'America/Sao_Paulo')`,
         count: count(),
       })
       .from(quiz_attempts)
@@ -325,7 +375,7 @@ export class GetUserStatisticsService {
           gte(quiz_attempts.attempted_at, startDate)
         )
       )
-      .groupBy(sql`DATE(${quiz_attempts.attempted_at})`)
+      .groupBy(sql`DATE(${quiz_attempts.attempted_at} AT TIME ZONE 'America/Sao_Paulo')`)
       .execute();
 
     // Combinar atividades por data

@@ -2,9 +2,11 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { InvalidCredentialsError } from "../../../services/errors/invalid-credentials-error.ts";
 import { makeAutheticateUser } from "../../../services/factories/user/make-authenticate.ts";
+import { UserDisabledError } from "@/services/errors/user-desactived-errors.ts";
 
 const OK = 200;
 const UNAUTHORIZED = 401;
+const FORBIDDEN = 403;
 const MIN_PASSWORD = 6;
 
 export async function autheticate(
@@ -58,6 +60,9 @@ export async function autheticate(
   } catch (err) {
     if (err instanceof InvalidCredentialsError) {
       return reply.status(UNAUTHORIZED).send({ message: err.message });
+    }
+    if (err instanceof UserDisabledError) {
+      return reply.status(FORBIDDEN).send({ message: err.message });
     }
   }
 }
