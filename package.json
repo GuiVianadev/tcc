@@ -1,0 +1,28 @@
+{
+  "name": "cognitio-ai-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cognitio AI - Plataforma de Estudos com IA",
+  "scripts": {
+    "install:backend": "cd backend-tcc && npm install",
+    "install:frontend": "cd web && npm install",
+    "build:backend": "cd backend-tcc && npm run build",
+    "build:frontend": "cd web && npm run build",
+    "start:backend": "cd backend-tcc && npm start",
+    "dev:backend": "cd backend-tcc && npm run dev",
+    "dev:frontend": "cd web && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuiVianadev/tcc"
+  },
+  "keywords": [
+    "education",
+    "ai",
+    "flashcards",
+    "spaced-repetition",
+    "quiz"
+  ],
+  "author": "Guilherme Viana e Fred Alisson",
+  "license": "MIT"
+}
