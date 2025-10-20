@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import { AppSidebar } from "@/components/sidebar";
 import { ModeToggle } from "@/components/theme/theme-toggle";
 import {
   SidebarInset,

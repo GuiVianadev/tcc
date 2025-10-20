@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteMaterial, useMaterials } from "@/hooks/use-materials";
+import type { Material } from "@/api/materials";
 
 /**
  * Componente de exemplo para listar materiais
@@ -20,9 +21,12 @@ import { useDeleteMaterial, useMaterials } from "@/hooks/use-materials";
  * - Atualização automática após deletar
  */
 export function MaterialList() {
-  const { data: materials, isLoading } = useMaterials();
+  const { data: materialsResponse, isLoading } = useMaterials();
   const { mutate: deleteMaterial, isPending: isDeleting } =
     useDeleteMaterial();
+
+  // Extrair array de materiais da resposta paginada
+  const materials: Material[] = (materialsResponse as any)?.materials || [];
 
   if (isLoading) {
     return (
@@ -47,7 +51,7 @@ export function MaterialList() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {materials.map((material) => (
+      {materials.map((material: Material) => (
         <Card key={material.id}>
           <CardHeader>
             <CardTitle>{material.title}</CardTitle>

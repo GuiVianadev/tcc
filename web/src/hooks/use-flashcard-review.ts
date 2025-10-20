@@ -69,6 +69,7 @@ export function useFlashcardReview(initialFlashcards: Flashcard[]) {
       queryClient.invalidateQueries({ queryKey: ["flashcards"] });
       queryClient.invalidateQueries({ queryKey: ["flashcards", "due"] });
       queryClient.invalidateQueries({ queryKey: ["materials"] });
+      queryClient.invalidateQueries({ queryKey: ["statistics"] });
     },
   });
 

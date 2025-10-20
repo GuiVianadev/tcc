@@ -135,7 +135,7 @@ export function Quizzes() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate("/materials/create")}>
+            <Button onClick={() => navigate("/app/materials/create")}>
               Criar Primeiro Material
             </Button>
           </CardContent>

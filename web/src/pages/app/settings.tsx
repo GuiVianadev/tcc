@@ -37,8 +37,8 @@ type UpdateUserForm = z.infer<typeof updateUserForm>
 
 const studyGoalsSchema = z.object({
   area_of_interest: z.string().min(1, "Área de interesse é obrigatória").optional(),
-  daily_flashcards_goal: z.coerce.number().min(1, "Mínimo de 1 flashcard").max(200, "Máximo de 200 flashcards").optional(),
-  daily_quizzes_goal: z.coerce.number().min(1, "Mínimo de 1 quiz").max(100, "Máximo de 100 quizzes").optional(),
+  daily_flashcards_goal: z.number().min(1, "Mínimo de 1 flashcard").max(200, "Máximo de 200 flashcards").optional(),
+  daily_quizzes_goal: z.number().min(1, "Mínimo de 1 quiz").max(100, "Máximo de 100 quizzes").optional(),
 });
 
 type UpdateStudyGoalsForm = z.infer<typeof studyGoalsSchema>;

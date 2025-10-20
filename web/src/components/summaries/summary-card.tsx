@@ -43,7 +43,7 @@ export function SummaryCard({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(summary.content);
+      await navigator.clipboard.writeText(summary.content || "");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -53,7 +53,7 @@ export function SummaryCard({
 
   // Truncar conteúdo para preview (primeiros 200 caracteres)
   const contentPreview = showPreview && summary.content && summary.content.length > 200
-    ? summary.content.substring(0, 200) + "..."
+    ? `${summary.content.substring(0, 200)}...`
     : summary.content || "Sem conteúdo disponível";
 
   return (

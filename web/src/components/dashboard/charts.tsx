@@ -49,10 +49,10 @@ export function StudyActivityChart() {
   }
 
   // Preparar dados para o gráfico
-  const chartData = activity.map(item => ({
-    date: new Date(item.date).toLocaleDateString('pt-BR', { 
-      month: 'short', 
-      day: 'numeric' 
+  const chartData = activity.map((item: { date: string; cards_studied: number; study_time: number; accuracy: number }) => ({
+    date: new Date(item.date).toLocaleDateString('pt-BR', {
+      month: 'short',
+      day: 'numeric'
     }),
     cards: item.cards_studied,
     time: item.study_time,
@@ -118,8 +118,8 @@ export function StudyDistributionChart() {
   }
 
   // Preparar dados para o gráfico de pizza
-  const totalCards = distribution.reduce((sum, item) => sum + item.cards_count, 0);
-  const totalTime = distribution.reduce((sum, item) => sum + item.study_time, 0);
+  const totalCards = distribution.reduce((sum: number, item: { cards_count: number; study_time: number }) => sum + item.cards_count, 0);
+  const totalTime = distribution.reduce((sum: number, item: { cards_count: number; study_time: number }) => sum + item.study_time, 0);
 
   return (
     <Card>
@@ -128,10 +128,10 @@ export function StudyDistributionChart() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {distribution.map((item, index) => {
+          {distribution.map((item: { subject: string; cards_count: number; study_time: number }, index: number) => {
             const percentage = totalCards > 0 ? (item.cards_count / totalCards) * 100 : 0;
             const timePercentage = totalTime > 0 ? (item.study_time / totalTime) * 100 : 0;
-            
+
             return (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">

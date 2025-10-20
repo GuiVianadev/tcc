@@ -39,7 +39,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   // Verifica se é admin
   if (user.role !== "admin") {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/app" replace />;
   }
 
   return <>{children}</>;

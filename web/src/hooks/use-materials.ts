@@ -114,6 +114,50 @@ export function useCreateMaterialFromFile() {
 }
 
 /**
+ * Hook para criar material (unificado)
+ *
+ * Decide automaticamente se cria a partir de tópico ou arquivo
+ *
+ * @example
+ * ```tsx
+ * const { mutate, isPending } = useCreateMaterial();
+ *
+ * // Com tópico
+ * mutate({ title: "React", topic: "Intro to hooks" });
+ *
+ * // Com arquivo
+ * mutate({ title: "React", file: pdfFile });
+ * ```
+ */
+export function useCreateMaterial() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { title: string; topic?: string | null; file?: File | null; flashcardsQuantity?: number; quizzesQuantity?: number }) => {
+      if (data.file) {
+        return createMaterialFromFile({
+          title: data.title,
+          file: data.file,
+          flashcardsQuantity: data.flashcardsQuantity,
+          quizzesQuantity: data.quizzesQuantity,
+        });
+      } else if (data.topic) {
+        return createMaterialFromTopic({
+          title: data.title,
+          topic: data.topic,
+          flashcardsQuantity: data.flashcardsQuantity,
+          quizzesQuantity: data.quizzesQuantity,
+        });
+      }
+      throw new Error("É necessário fornecer um tópico ou um arquivo");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["materials"] });
+    },
+  });
+}
+
+/**
  * Hook para deletar um material
  *
  * @example

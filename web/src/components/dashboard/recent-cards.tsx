@@ -1,11 +1,11 @@
-import { Clock, BookOpen, TrendingUp } from "lucide-react";
+import { Clock, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRecentCards } from "@/api/queries/dashboard";
 import { Link } from "react-router-dom";
 
 export function RecentCards() {
-  const { data: recentCards, isLoading, error } = useRecentCards(5);
+  const { data: recentCards, isLoading, error } = useRecentCards();
 
   if (isLoading) {
     return (
@@ -140,11 +140,11 @@ export function RecentCards() {
         
         {recentCards.length >= 5 && (
           <div className="mt-4 pt-4 border-t">
-            <Link 
-              to="/decks" 
+            <Link
+              to="/app/flashcards"
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
             >
-              Ver todos os decks →
+              Ver todos os flashcards →
             </Link>
           </div>
         )}

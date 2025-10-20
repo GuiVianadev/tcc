@@ -99,10 +99,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-if (env.VITE_ENABLE_API_DELAY) {
-  api.interceptors.request.use(async (config) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    return config;
-  });
-}

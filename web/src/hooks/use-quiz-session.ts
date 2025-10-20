@@ -82,6 +82,8 @@ export function useQuizSession(initialQuizzes: Quiz[]) {
       // Invalidar cache
       queryClient.invalidateQueries({ queryKey: ["quizzes"] });
       queryClient.invalidateQueries({ queryKey: ["materials"] });
+      queryClient.invalidateQueries({ queryKey: ["statistics"] });
+
     },
   });
 

@@ -174,7 +174,7 @@ export function QuizSession({ materialId }: QuizSessionProps) {
           <p className="text-lg font-medium">{currentQuiz.question}</p>
 
           <div className="space-y-2">
-            {currentQuiz.options.map((option) => {
+            {currentQuiz.options?.map((option) => {
               const isSelected = selectedAnswer === option.id;
               const isCorrect = option.id === currentQuiz.correct_answer;
               const showFeedback = result !== null;

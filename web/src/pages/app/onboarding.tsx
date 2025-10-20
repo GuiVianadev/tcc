@@ -39,7 +39,7 @@ export function Onboarding() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<StudyGoalsForm>({
+  } = useForm({
     resolver: zodResolver(studyGoalsSchema),
     defaultValues: {
       area_of_interest: "",
@@ -56,7 +56,7 @@ export function Onboarding() {
       // Marca onboarding como completo
       await updateProfile({ is_first_access: false });
 
-      navigate("/dashboard");
+      navigate("/app");
     } catch (error) {
       console.error("Erro ao completar onboarding:", error);
     }
@@ -154,7 +154,7 @@ export function Onboarding() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-800 hover:bg-blue-700"
+
                 >
                   {isSubmitting ? "Salvando..." : "Começar a usar"}
                 </Button>

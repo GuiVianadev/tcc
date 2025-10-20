@@ -22,4 +22,4 @@ function InputWithIcon({
   );
 }
 
-export type { Input };
+export { InputWithIcon };

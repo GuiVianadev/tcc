@@ -61,7 +61,7 @@ export function MaterialQuizzes() {
               <p className="text-muted-foreground">
                 Este material ainda não tem quizzes gerados.
               </p>
-              <Button onClick={() => navigate("/materials")}>
+              <Button onClick={() => navigate("/app/materials")}>
                 Voltar para Materiais
               </Button>
             </div>
@@ -98,13 +98,13 @@ export function MaterialQuizzes() {
               </p>
               <div className="flex gap-4 justify-center">
                 <Button
-                  onClick={() => navigate("/materials")}
+                  onClick={() => navigate("/app/materials")}
                   variant="outline"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Voltar para Materiais
                 </Button>
-                <Button onClick={() => navigate("/dashboard")}>
+                <Button onClick={() => navigate("/app")}>
                   Ir para Dashboard
                 </Button>
               </div>
@@ -123,7 +123,7 @@ export function MaterialQuizzes() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/materials")}
+            onClick={() => navigate("/app/materials")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

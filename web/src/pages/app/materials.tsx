@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Brain, BookOpen, ClipboardList } from "lucide-react";
 import { useMaterials, useDeleteMaterial } from "@/hooks/use-materials";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,11 +55,6 @@ export function Materials() {
     });
   }
 
-  function truncateContent(content: string, maxLength = 150) {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + "...";
-  }
-
   if (error) {
     return (
       <div className="container mx-auto p-6">
@@ -84,8 +78,7 @@ export function Materials() {
           </p>
         </div>
         <Button
-          onClick={() => navigate("/materials/create")}
-          className="bg-foreground"
+          onClick={() => navigate("/app/materials/create")}
         >
           Criar Material
         </Button>
@@ -132,7 +125,7 @@ export function Materials() {
               Comece criando seu primeiro material de estudo
             </p>
             <Button
-              onClick={() => navigate("/materials/create")}
+              onClick={() => navigate("/app/materials/create")}
               className="bg-foreground"
             >
               Criar Primeiro Material
@@ -154,30 +147,28 @@ export function Materials() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col">
-                  <p className="mb-4 flex-1 text-muted-foreground text-sm">
-                    {truncateContent(material.content)}
-                  </p>
+
                   <div className="flex flex-col gap-2">
                     <div className="grid grid-cols-3 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         className="gap-1"
-                        onClick={() => navigate(`/summaries/${material.id}`)}
+                        onClick={() => navigate(`/app/summaries/${material.id}`)}
                       >
                         Resumo
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/materials/${material.id}/flashcards`)}
+                        onClick={() => navigate(`/app/materials/${material.id}/flashcards`)}
                       >
                         Cards
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/materials/${material.id}/quizzes`)}
+                        onClick={() => navigate(`/app/materials/${material.id}/quizzes`)}
                       >
                         Quizzes
                       </Button>

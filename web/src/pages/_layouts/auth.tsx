@@ -1,12 +1,11 @@
 import { Outlet } from "react-router-dom";
-import Logo from "../../assets/logo-CognitioAI.svg?react";
 
 export function AuthLayout() {
   return (
-    <div className="flex min-h-screen flex-col justify-center antialiased md:grid md:grid-cols-2">
-      <div className="flex h-full flex-col justify-between rounded-r-lg border-foreground/5 p-10 text-muted-foreground md:border-r md:bg-[url(/src/assets/bg-auth.png)] md:bg-cover md:bg-muted md:bg-no-repeat">
+    <div className="flex min-h-screen flex-col justify-center antialiased bg-zinc-950">
+      <div className="flex h-full flex-col justify-between rounded-r-lg border-foreground/5 p-10 text-muted-foreground md:border-r ">
         <div className="flex items-center justify-center gap-3 text-foreground text-lg md:justify-normal">
-          <Logo className="h-10 w-46 fill-blue-800 md:fill-white" />
+          <img className="absolute mx-auto top-0 left-1/2 transform -translate-x-1/2 z-0  object-contain" src="./src/assets/top.webp" alt="" />
         </div>
       </div>
 

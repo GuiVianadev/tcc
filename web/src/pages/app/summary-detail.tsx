@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useMaterialSummary } from "@/hooks/use-summaries";
 import { SummaryViewer } from "@/components/summaries/summary-viewer";
 import { Button } from "@/components/ui/button";
@@ -20,12 +20,8 @@ export function SummaryDetail() {
   const { materialId } = useParams<{ materialId: string }>();
   const navigate = useNavigate();
 
-  const { data: summary, isLoading, error } = useMaterialSummary(materialId!);
+  const { data: summary, isLoading } = useMaterialSummary(materialId!);
 
-  // Debug: ver o que está chegando do backend
-  console.log("Summary data:", summary);
-  console.log("Material ID:", materialId);
-  console.log("Error:", error);
 
   if (isLoading) {
     return (
@@ -46,7 +42,7 @@ export function SummaryDetail() {
               <p className="text-muted-foreground">
                 O resumo que você está procurando não existe ou foi removido
               </p>
-              <Button onClick={() => navigate("/materials")}>
+              <Button onClick={() => navigate("/app/materials")}>
                 Voltar para Resumos
               </Button>
             </div>
@@ -64,7 +60,7 @@ export function SummaryDetail() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/materials")}
+            onClick={() => navigate("/app/materials")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

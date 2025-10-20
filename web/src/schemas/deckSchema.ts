@@ -9,7 +9,7 @@ const deckBaseSchema = z.object({
   difficulty_level: z
     .enum(["beginner", "intermediate", "advanced"])
     .default("beginner"),
-  srs_settings: z.record(z.any()).default({
+  srs_settings: z.record(z.string(), z.any()).default({
     new_cards_per_day: 20,
     max_reviews_per_day: 100,
     learning_steps: [1, 10],
@@ -25,11 +25,7 @@ export const deckCreateSchema = deckBaseSchema.extend({
     .min(3, "O título deve ter pelo menos 3 caracteres")
     .transform((val) => val.trim()), // Espelha o .strip() do Python
 
-  difficulty_level: z.enum(["beginner", "intermediate", "advanced"], {
-    errorMap: () => ({
-      message: "Nível deve ser: beginner, intermediate ou advanced",
-    }),
-  }),
+  difficulty_level: z.enum(["beginner", "intermediate", "advanced"]),
 });
 
 export const deckUpdateSchema = z.object({
@@ -39,7 +35,7 @@ export const deckUpdateSchema = z.object({
   tags: z.array(z.string()).optional(),
   is_public: z.boolean().optional(),
   difficulty_level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
-  srs_settings: z.record(z.any()).optional(),
+  srs_settings: z.record(z.string(), z.any()).optional(),
 });
 
 

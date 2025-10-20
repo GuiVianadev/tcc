@@ -2,12 +2,13 @@ import { api } from "@/lib/axios";
 
 export type GetProfileResponse = {
   user: {
+    id: string;
     name: string;
     email: string;
     role: "student" | "admin";
     is_first_access: boolean;
-    created_at: Date;
-    updated_at: Date | null;
+    created_at: string;
+    updated_at: string | null;
   };
 };
 

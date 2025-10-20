@@ -30,6 +30,18 @@ export type RecentActivity = {
   study_time_minutes: number;
 };
 
+export type UpcomingReviewMaterial = {
+  material_id: string;
+  material_title: string;
+  flashcards_count: number;
+};
+
+export type UpcomingReview = {
+  date: string;
+  flashcards_due: number;
+  materials: UpcomingReviewMaterial[];
+};
+
 export type UserStatistics = {
   total_materials: number;
   total_flashcards: number;
@@ -41,6 +53,7 @@ export type UserStatistics = {
   flashcard_stats: FlashcardStats;
   quiz_stats: QuizStats;
   recent_activity: RecentActivity[];
+  upcoming_reviews: UpcomingReview[];
 };
 
 // ========== API FUNCTIONS ==========

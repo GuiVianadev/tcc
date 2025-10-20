@@ -32,24 +32,40 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartBarInteractive() {
+type ChartData = {
+  date: string;
+  cards?: number;
+  time?: number;
+  accuracy?: number;
+  flashcards_reviewed?: number;
+  quizzes_completed?: number;
+};
+
+type ChartBarInteractiveProps = {
+  data?: ChartData[];
+  title?: string;
+  description?: string;
+};
+
+export function ChartBarInteractive({ data: externalData, title = "Atividade de Estudos", description = "Suas atividades nos últimos 7 dias" }: ChartBarInteractiveProps = {}) {
   const { data: statistics, isLoading } = useUserStatistics();
 
   const chartData = React.useMemo(() => {
+    if (externalData) return externalData;
     if (!statistics?.recent_activity) return [];
     return statistics.recent_activity.map((activity) => ({
       date: activity.date,
       flashcards_reviewed: activity.flashcards_reviewed,
       quizzes_completed: activity.quizzes_completed,
     }));
-  }, [statistics]);
+  }, [statistics, externalData]);
 
-  if (isLoading) {
+  if (isLoading && !externalData) {
     return (
       <Card className="justify-center p-5">
         <CardHeader>
-          <CardTitle>Atividade de Estudos</CardTitle>
-          <CardDescription>Suas atividades nos últimos 7 dias</CardDescription>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[250px] w-full" />
@@ -58,12 +74,12 @@ export function ChartBarInteractive() {
     );
   }
 
-  if (!statistics || chartData.length === 0) {
+  if ((!statistics && !externalData) || chartData.length === 0) {
     return (
       <Card className="justify-center p-5">
         <CardHeader>
-          <CardTitle>Atividade de Estudos</CardTitle>
-          <CardDescription>Suas atividades nos últimos 7 dias</CardDescription>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[250px]">
           <p className="text-sm text-muted-foreground">
@@ -78,9 +94,9 @@ export function ChartBarInteractive() {
     <Card className="justify-center p-5">
       <CardHeader className="!p-0 flex flex-col items-stretch border-b border-none sm:flex-row">
         <div className="sm:!py-0 flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3">
-          <CardTitle>Atividade de Estudos</CardTitle>
+          <CardTitle>{title}</CardTitle>
           <CardDescription>
-            Suas atividades nos últimos 7 dias
+            {description}
           </CardDescription>
         </div>
       </CardHeader>

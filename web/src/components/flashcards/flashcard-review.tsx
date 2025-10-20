@@ -30,8 +30,18 @@ export function FlashcardReview({ flashcard, onNext }: FlashcardReviewProps) {
   const { mutate: reviewFlashcard, isPending } = useReviewFlashcard();
 
   const handleReview = (quality: 0 | 1 | 2 | 3 | 4 | 5) => {
+    // Mapear quality (0-5) para difficulty (again, hard, good, easy)
+    const difficultyMap: Record<number, "again" | "hard" | "good" | "easy"> = {
+      0: "again",
+      1: "again",
+      2: "hard",
+      3: "good",
+      4: "good",
+      5: "easy",
+    };
+
     reviewFlashcard(
-      { flashcardId: flashcard.id, quality },
+      { flashcardId: flashcard.id, difficulty: difficultyMap[quality] },
       {
         onSuccess: () => {
           // Reseta o estado e vai para o próximo
@@ -48,7 +58,7 @@ export function FlashcardReview({ flashcard, onNext }: FlashcardReviewProps) {
         <CardTitle>Flashcard</CardTitle>
         <CardDescription>
           Próxima revisão:{" "}
-          {new Date(flashcard.next_review).toLocaleDateString()}
+          {flashcard.next_review ? new Date(flashcard.next_review).toLocaleDateString() : "Não agendada"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -139,9 +149,9 @@ export function FlashcardReview({ flashcard, onNext }: FlashcardReviewProps) {
 
           {/* Informações do SRS */}
           <div className="flex gap-4 text-xs text-muted-foreground justify-center">
-            <span>Facilidade: {flashcard.easiness_factor.toFixed(2)}</span>
-            <span>Intervalo: {flashcard.interval} dias</span>
-            <span>Repetições: {flashcard.repetitions}</span>
+            <span>Facilidade: {flashcard.easiness_factor ? flashcard.easiness_factor.toFixed(2) : "N/A"}</span>
+            <span>Intervalo: {flashcard.interval || 0} dias</span>
+            <span>Repetições: {flashcard.repetitions || 0}</span>
           </div>
         </div>
       </CardContent>

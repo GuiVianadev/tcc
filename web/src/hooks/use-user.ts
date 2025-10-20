@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUserProfile, type UpdateUserProfileRequest } from "@/api/users";
+import { updateUserProfile } from "@/api/users";
 import { useAuth } from "./useAuth";
 
 /**

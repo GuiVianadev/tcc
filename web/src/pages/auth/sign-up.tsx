@@ -8,6 +8,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import IconLogo from "../../assets/icon-logo.svg?react"
 
 const MIN_PASSWORD = 8;
 const MIN_NAME = 2;
@@ -39,13 +41,13 @@ export function SignUp() {
   const { mutateAsync: registerAccount } = useMutation({
     mutationFn: signUp,
     onSuccess: () => {
+      toast.success("Conta criada com sucesso!")
       navigate("/sign-in");
     },
   });
 
   async function handleSignUp(data: SignUpForm) {
     try {
-      // Concatena firstName e lastName para enviar como name
       const fullName = `${data.firstName} ${data.lastName}`;
 
       await registerAccount({
@@ -64,22 +66,25 @@ export function SignUp() {
 
   return (
     <div className="p-8">
-      <div className="flex w-[350px] flex-col justify-center gap-6 pb-6">
-        <div className="flex flex-col gap-2 font-semibold">
-          <h1 className="font-bold text-2xl">Criar conta</h1>
-          <span className="font-light text-muted-foreground">
-            Já tem uma conta?{" "}
-            <Link
-              className="font-semibold text-blue-800 hover:text-blue-700"
-              to={"/sign-in"}
-            >
-              Fazer login
-            </Link>
-          </span>
+      <div className="flex  flex-col justify-center gap-6 pb-6">
+        <div className="flex gap-2 font-semibold justify-between items-center">
+          <div>
+            <h1 className="font-bold text-2xl text-white">Criar conta</h1>
+            <span className="font-light text-muted-foreground">
+              Já tem uma conta?{" "}
+              <Link
+                className="font-semibold text-orange-400 hover:text-orange-300"
+                to={"/sign-in"}
+              >
+                Fazer login
+              </Link>
+            </span>
+          </div>
+          <IconLogo className="h-8 w-8" />
         </div>
       </div>
       <form
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-6 text-white"
         onSubmit={handleSubmit(handleSignUp)}
       >
         <div className="space-y-3">
@@ -92,7 +97,7 @@ export function SignUp() {
           />
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="flex flex-col gap-2">
               <Label htmlFor="firstName">Nome</Label>
               <Input
                 id="firstName"
@@ -101,7 +106,7 @@ export function SignUp() {
                 placeholder="Ex: João"
               />
             </div>
-            <div>
+            <div className="flex flex-col gap-2">
               <Label htmlFor="lastName">Sobrenome</Label>
               <Input
                 id="lastName"
@@ -128,7 +133,6 @@ export function SignUp() {
             placeholder="Digite a senha novamente"
           />
         </div>
-
         {errorMessages.length > 0 && (
           <Alert variant="destructive">
             <AlertDescription>
@@ -142,7 +146,7 @@ export function SignUp() {
         )}
 
         <Button
-          className="bg-blue-800 hover:bg-blue-700"
+          variant={"cognitio"}
           disabled={isSubmitting}
           type="submit"
         >

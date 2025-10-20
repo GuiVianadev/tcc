@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BookOpen, Search, Filter } from "lucide-react";
 import { useSummaries } from "@/hooks/use-summaries";
 import { SummaryCard } from "@/components/summaries/summary-card";
+import type { Summary } from "@/api/summaries";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,14 +34,14 @@ export function Summaries() {
   const { data: summaries, isLoading } = useSummaries(page);
 
   // Garantir que summaries seja um array (caso backend retorne objeto com propriedade)
-  const summariesArray = Array.isArray(summaries)
+  const summariesArray: Summary[] = Array.isArray(summaries)
     ? summaries
-    : summaries?.summaries
-    ? summaries.summaries
+    : (summaries as any)?.summaries
+    ? (summaries as any).summaries
     : [];
 
   // Filtrar resumos pelo termo de busca
-  const filteredSummaries = summariesArray.filter((summary) => {
+  const filteredSummaries = summariesArray.filter((summary: Summary) => {
     const search = searchTerm.toLowerCase();
     return (
       summary.material_title?.toLowerCase().includes(search) ||
@@ -96,7 +97,7 @@ export function Summaries() {
       {/* Lista de Resumos */}
       {filteredSummaries && filteredSummaries.length > 0 ? (
         <div className="space-y-4">
-          {filteredSummaries.map((summary) => (
+          {filteredSummaries.map((summary: Summary) => (
             <SummaryCard
               key={summary.id}
               summary={summary}
@@ -126,7 +127,7 @@ export function Summaries() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate("/materials/create")}>
+            <Button onClick={() => navigate("/app/materials/create")}>
               Criar Primeiro Material
             </Button>
           </CardContent>

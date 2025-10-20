@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Book, Brain, Flame, RefreshCcw, ClipboardList, FileText, ArrowRight } from "lucide-react";
+import { Book, Brain, Flame, ClipboardList, FileText, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/api/get-profile";
 import { useUserStatistics } from "@/hooks/use-statistics";
-import { useMaterials, useRecentMaterials } from "@/hooks/use-materials";
+import { useRecentMaterials } from "@/hooks/use-materials";
 import { ChartBarInteractive } from "@/components/chart-bar-interactive";
 import { ChartPieLabelCustom } from "@/components/chart-pie-label-custom";
 import { DailyGoals } from "@/components/dashboard/daily-goals";
@@ -147,7 +147,7 @@ export function Dashboard() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/materials")}
+              onClick={() => navigate("/app/materials")}
             >
               Ver todos
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -172,7 +172,7 @@ export function Dashboard() {
                   <div
                     key={material.id}
                     className="flex items-center gap-4 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                    onClick={() => navigate(`/materials`)}
+                    onClick={() => navigate(`/app/materials`)}
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded bg-primary/10">
                       <FileText className="h-6 w-6 text-primary" />
@@ -189,7 +189,7 @@ export function Dashboard() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/summaries/${material.id}`);
+                          navigate(`/app/summaries/${material.id}`);
                         }}
                       >
                         <Book className="h-4 w-4" />
@@ -199,7 +199,7 @@ export function Dashboard() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/materials/${material.id}/flashcards`);
+                          navigate(`/app/materials/${material.id}/flashcards`);
                         }}
                       >
                         <Brain className="h-4 w-4" />
@@ -209,7 +209,7 @@ export function Dashboard() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/materials/${material.id}/quizzes`);
+                          navigate(`/app/materials/${material.id}/quizzes`);
                         }}
                       >
                         <ClipboardList className="h-4 w-4" />
@@ -226,7 +226,7 @@ export function Dashboard() {
                 </p>
                 <Button
                   className="mt-4"
-                  onClick={() => navigate("/materials/create")}
+                  onClick={() => navigate("/app/materials/create")}
                 >
                   Criar primeiro material
                 </Button>

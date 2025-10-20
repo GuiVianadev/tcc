@@ -8,11 +8,13 @@ export function Navlink(props: NavLinkProps) {
   const isActive = () => {
     const to = props.to?.toString() || "";
 
-    if (to === "" || to === "/") {
-      return pathname === "/" || pathname === "";
+    // Para a rota /app (Dashboard), só ativa se o pathname for exatamente /app
+    if (to === "/app") {
+      return pathname === "/app";
     }
 
-    return pathname === `/${to}` || pathname.includes(to);
+    // Para outras rotas, verifica se o pathname começa com a rota
+    return pathname.startsWith(to);
   };
 
   const active = isActive();

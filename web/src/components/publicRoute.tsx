@@ -29,8 +29,8 @@ export function PublicRoute({ children }: PublicRouteProps) {
     if (user.role === "admin") {
       return <Navigate to="/admin/users" replace />;
     }
-    // Caso contrário, redireciona para dashboard
-    return <Navigate to="/dashboard" replace />;
+    // Caso contrário, redireciona para app
+    return <Navigate to="/app" replace />;
   }
 
   return <>{children}</>;

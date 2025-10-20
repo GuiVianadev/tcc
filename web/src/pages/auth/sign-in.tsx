@@ -7,9 +7,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import IconLogo from "../../assets/icon-logo.svg?react"
+
 
 const signInForm = z.object({
-  email: z.email(),
+  email: z.email("Email inválido"),
   password: z.string(),
 });
 
@@ -32,16 +34,14 @@ export function SignIn() {
     try {
       const user = await signIn(data.email, data.password);
 
-      // Redireciona baseado em primeiro acesso ou role
       if (user.is_first_access) {
         navigate("/onboarding");
       } else if (user.role === "admin") {
         navigate("/admin/users");
       } else {
-        navigate("/dashboard");
+        navigate("/app");
       }
     } catch (error: any) {
-      // Define erro no formulário
       if (error?.response?.status === 401) {
         setError("root", {
           type: "manual",
@@ -61,23 +61,26 @@ export function SignIn() {
     .filter(Boolean);
 
   return (
-    <div className="p-8">
-      <div className="flex w-[350px] flex-col justify-center gap-6 pb-6">
-        <div className="flex flex-col gap-2 font-semibold">
-          <h1 className="font-bold text-2xl">Bem vindo de volta</h1>
-          <span className="font-light text-muted-foreground">
-            Não tem uma conta?{" "}
-            <Link
-              className="font-semibold text-blue-800 hover:text-blue-700"
-              to={"/sign-up"}
-            >
-              Criar conta
-            </Link>
-          </span>
+    <div className="p-8 w-[460px]">
+      <div className="flex  flex-col justify-center gap-6 pb-6">
+        <div className="flex gap-2 font-semibold justify-between items-center">
+          <div>
+            <h1 className="font-bold text-2xl text-white">Fazer login</h1>
+            <span className="font-light text-muted-foreground">
+              Não tem uma conta?{" "}
+              <Link
+                className="font-semibold text-orange-400 hover:text-orange-300"
+                to={"/sign-up"}
+              >
+                Fazer registro
+              </Link>
+            </span>
+          </div>
+          <IconLogo className="h-8 w-8" />
         </div>
       </div>
       <form
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-6 text-white"
         onSubmit={handleSubmit(handleSignIn)}
       >
         <div className="space-y-3">
@@ -97,7 +100,6 @@ export function SignIn() {
           />
         </div>
 
-        {/* Erros */}
         {errorMessages.length > 0 && (
           <Alert variant="destructive">
             <AlertDescription>
@@ -111,7 +113,7 @@ export function SignIn() {
         )}
 
         <Button
-          className="bg-blue-800 hover:bg-blue-700"
+          variant={"cognitio"}
           disabled={isSubmitting}
           type="submit"
         >

@@ -1,15 +1,11 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Calendar,
   ChevronUp,
-  Inbox,
   LayoutDashboardIcon,
   Settings,
   User2,
   FolderOpen,
-  BookOpen,
-  Brain,
-  ClipboardList,
   Trophy,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -39,28 +35,27 @@ import { Skeleton } from "./ui/skeleton";
 const items = [
   {
     title: "Dashboard",
-    url: "",
+    url: "/app",
     icon: LayoutDashboardIcon,
   },
   {
     title: "Materiais",
-    url: "materials",
+    url: "/app/materials",
     icon: FolderOpen,
   },
-
   {
     title: "Calendário",
-    url: "calendar",
+    url: "/app/calendar",
     icon: Calendar,
   },
   {
     title: "Ranking",
-    url: "ranking",
+    url: "/app/ranking",
     icon: Trophy,
   },
   {
     title: "Configurações",
-    url: "settings",
+    url: "/app/settings",
     icon: Settings,
   },
 ];
@@ -109,11 +104,11 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarMenu className="rounded-2xl border p-2 dark:border-zinc-800 dark:bg-black">
+        <SidebarMenu className="rounded-2xl border p-2 w-52 dark:border-zinc-800 dark:bg-black">
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
+                <SidebarMenuButton className="w-48 truncate">
                   <User2 />{" "}
                   {isLoadingProfile ? (
                     <Skeleton className="h-4 w-40" />

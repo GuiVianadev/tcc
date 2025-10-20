@@ -11,18 +11,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 const topicSchema = z.object({
   title: z.string().min(3, "Mínimo de 3 caracteres").max(200, "Máximo de 200 caracteres"),
   topic: z.string().min(3, "Mínimo de 3 caracteres").max(500, "Máximo de 500 caracteres"),
-  flashcardsQuantity: z.coerce.number().min(5, "Mínimo 5").max(20, "Máximo 20").optional(),
-  quizzesQuantity: z.coerce.number().min(3, "Mínimo 3").max(15, "Máximo 15").optional(),
 });
 
 const fileSchema = z.object({
   title: z.string().min(3, "Mínimo de 3 caracteres").max(200, "Máximo de 200 caracteres"),
-  flashcardsQuantity: z.coerce.number().min(5, "Mínimo 5").max(20, "Máximo 20").optional(),
-  quizzesQuantity: z.coerce.number().min(3, "Mínimo 3").max(15, "Máximo 15").optional(),
 });
 
 type TopicForm = z.infer<typeof topicSchema>;
@@ -53,24 +50,17 @@ export function CreateMaterial() {
 
   const topicForm = useForm<TopicForm>({
     resolver: zodResolver(topicSchema),
-    defaultValues: {
-      flashcardsQuantity: 10,
-      quizzesQuantity: 5,
-    },
   });
 
   const fileForm = useForm<FileForm>({
     resolver: zodResolver(fileSchema),
-    defaultValues: {
-      flashcardsQuantity: 10,
-      quizzesQuantity: 5,
-    },
   });
 
   async function handleCreateFromTopic(data: TopicForm) {
     try {
       await createFromTopic(data);
-      navigate("/materials");
+      navigate("/app/materials");
+      toast("Material criado com sucesso!")
     } catch (error: any) {
       topicForm.setError("root", {
         message: error?.response?.data?.message || "Erro ao criar material",
@@ -89,7 +79,9 @@ export function CreateMaterial() {
         ...data,
         file: selectedFile,
       });
-      navigate("/materials");
+      navigate("/app/materials");
+      toast("Material criado com sucesso!")
+
     } catch (error: any) {
       fileForm.setError("root", {
         message: error?.response?.data?.message || "Erro ao criar material",
@@ -178,29 +170,9 @@ export function CreateMaterial() {
                     placeholder="Descreva o que você quer estudar. Ex: Conceitos básicos de React, incluindo componentes, props e state"
                     rows={4}
                   />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="topic-flashcards">Quantidade de Flashcards</Label>
-                    <Input
-                      id="topic-flashcards"
-                      type="number"
-                      min={5}
-                      max={20}
-                      {...topicForm.register("flashcardsQuantity")}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="topic-quizzes">Quantidade de Quizzes</Label>
-                    <Input
-                      id="topic-quizzes"
-                      type="number"
-                      min={3}
-                      max={15}
-                      {...topicForm.register("quizzesQuantity")}
-                    />
-                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    A IA gerará automaticamente 15 flashcards, 15 quizzes e 1 resumo
+                  </p>
                 </div>
 
                 {topicErrors.length > 0 && (
@@ -219,14 +191,13 @@ export function CreateMaterial() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/materials")}
+                    onClick={() => navigate("/app/materials")}
                   >
                     Cancelar
                   </Button>
                   <Button
                     type="submit"
                     disabled={isCreatingFromTopic}
-                    className="bg-blue-800 hover:bg-blue-700"
                   >
                     {isCreatingFromTopic ? "Gerando material..." : "Criar Material"}
                   </Button>
@@ -242,8 +213,8 @@ export function CreateMaterial() {
             <CardHeader>
               <CardTitle>Upload de Arquivo</CardTitle>
               <CardDescription>
-                Envie um PDF, DOCX, TXT, PNG ou JPG (máx 10MB). A IA extrairá o conteúdo e gerará
-                flashcards e quizzes
+                Envie um PDF, DOCX, TXT (máx 10MB). A IA extrairá o conteúdo e gerará resumo
+                ,flashcards e quizzes
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -264,11 +235,10 @@ export function CreateMaterial() {
                 <div>
                   <Label>Arquivo</Label>
                   <div
-                    className={`mt-2 flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${
-                      dragActive
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
+                    className={`mt-2 flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${dragActive
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-300 hover:border-gray-400"
+                      }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
@@ -325,7 +295,7 @@ export function CreateMaterial() {
                           Arraste um arquivo ou clique para selecionar
                         </p>
                         <p className="text-muted-foreground text-sm">
-                          PDF, DOCX, TXT, PNG, JPG (máx 10MB)
+                          PDF, DOCX, TXT (máx 10MB)
                         </p>
                       </div>
                     )}
@@ -337,29 +307,9 @@ export function CreateMaterial() {
                     accept=".pdf,.docx,.txt,.png,.jpg,.jpeg"
                     onChange={handleFileSelect}
                   />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="file-flashcards">Quantidade de Flashcards</Label>
-                    <Input
-                      id="file-flashcards"
-                      type="number"
-                      min={5}
-                      max={20}
-                      {...fileForm.register("flashcardsQuantity")}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="file-quizzes">Quantidade de Quizzes</Label>
-                    <Input
-                      id="file-quizzes"
-                      type="number"
-                      min={3}
-                      max={15}
-                      {...fileForm.register("quizzesQuantity")}
-                    />
-                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    A IA gerará automaticamente 15 flashcards, 15 quizzes e 1 resumo a partir do arquivo
+                  </p>
                 </div>
 
                 {fileErrors.length > 0 && (
@@ -378,14 +328,13 @@ export function CreateMaterial() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/materials")}
+                    onClick={() => navigate("/app/materials")}
                   >
                     Cancelar
                   </Button>
                   <Button
                     type="submit"
                     disabled={isCreatingFromFile}
-                    className="bg-blue-800 hover:bg-blue-700"
                   >
                     {isCreatingFromFile ? "Processando arquivo..." : "Criar Material"}
                   </Button>

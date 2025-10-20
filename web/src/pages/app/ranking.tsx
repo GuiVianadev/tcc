@@ -101,7 +101,6 @@ export function Ranking() {
 
   const users = data?.users || [];
   const topThree = users.slice(0, 3);
-  const restOfUsers = users.slice(3);
 
   return (
     <div className="container mx-auto py-8 space-y-6">

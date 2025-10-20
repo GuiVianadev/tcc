@@ -1,28 +1,39 @@
-import { useState } from "react";
-import { Plus, Target, Calendar, CheckCircle, Edit, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Target, Calendar, CheckCircle, Trash2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useStudyGoals, useCreateStudyGoal, useUpdateStudyGoal, useDeleteStudyGoal } from "@/api/queries/dashboard";
+import { useStudyGoals } from "@/api/queries/dashboard";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function StudyGoals() {
   const { data: goals, isLoading, error } = useStudyGoals();
-  const createGoal = useCreateStudyGoal();
-  const updateGoal = useUpdateStudyGoal();
-  const deleteGoal = useDeleteStudyGoal();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<any>(null);
+  const queryClient = useQueryClient();
+
+  const createGoal = useMutation({
+    mutationFn: async (data: { title: string; target_cards: number; target_date: string }) => {
+      // TODO: Implement API call
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["study-goals"] });
+    },
+  });
+
+  const deleteGoal = useMutation({
+    mutationFn: async (goalId: string) => {
+      // TODO: Implement API call
+      return goalId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["study-goals"] });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -80,20 +91,11 @@ export function StudyGoals() {
             <p className="text-gray-500 mb-4">
               Crie suas primeiras metas de estudo para acompanhar seu progresso
             </p>
-            <CreateGoalDialog 
-              isOpen={isCreateDialogOpen}
-              onOpenChange={setIsCreateDialogOpen}
-              onCreateGoal={createGoal.mutate}
-            />
           </div>
         </CardContent>
       </Card>
     );
   }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
 
   const getProgressPercentage = (current: number, target: number) => {
     return Math.min((current / target) * 100, 100);
@@ -146,13 +148,6 @@ export function StudyGoals() {
                   </div>
                   
                   <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditingGoal(goal)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

@@ -3,6 +3,7 @@ import { ArrowLeft, RotateCw, CheckCircle, Trophy } from "lucide-react";
 import { useDueFlashcards } from "@/hooks/use-flashcards";
 import { useFlashcardReview } from "@/hooks/use-flashcard-review";
 import { FlashcardReviewCard } from "@/components/flashcards/flashcard-review-card";
+import type { Flashcard } from "@/api/flashcards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -25,10 +26,10 @@ export function FlashcardReview() {
   const { data: dueFlashcards, isLoading } = useDueFlashcards();
 
   // Garantir que seja array
-  const flashcardsArray = Array.isArray(dueFlashcards)
+  const flashcardsArray: Flashcard[] = Array.isArray(dueFlashcards)
     ? dueFlashcards
-    : dueFlashcards?.flashcards
-    ? dueFlashcards.flashcards
+    : (dueFlashcards as any)?.flashcards
+    ? (dueFlashcards as any).flashcards
     : [];
 
   const {
@@ -62,7 +63,7 @@ export function FlashcardReview() {
               <p className="text-muted-foreground">
                 Você não tem flashcards para revisar no momento.
               </p>
-              <Button onClick={() => navigate("/flashcards")}>
+              <Button onClick={() => navigate("/app/flashcards")}>
                 Voltar para Flashcards
               </Button>
             </div>
@@ -101,13 +102,13 @@ export function FlashcardReview() {
               </p>
               <div className="flex gap-4 justify-center">
                 <Button
-                  onClick={() => navigate("/flashcards")}
+                  onClick={() => navigate("/app/flashcards")}
                   variant="outline"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Voltar para Flashcards
                 </Button>
-                <Button onClick={() => navigate("/dashboard")}>
+                <Button onClick={() => navigate("/app")}>
                   Ir para Dashboard
                 </Button>
               </div>
@@ -154,7 +155,7 @@ export function FlashcardReview() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/flashcards")}
+            onClick={() => navigate("/app/flashcards")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

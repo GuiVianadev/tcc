@@ -159,9 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return;
         }
 
-        console.log("[Auth] Renovando token automaticamente...");
         await refreshToken();
-        console.log("[Auth] Token renovado com sucesso");
       } catch (error) {
         console.error("[Auth] Erro ao renovar token automaticamente:", error);
 
