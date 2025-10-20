@@ -37,7 +37,7 @@ const SIZE_FILE = 1024;
 
 app.register(multipart, {
   limits: {
-    fileSize: 10 * SIZE_FILE * SIZE_FILE, // 10MB
+    fileSize: 10 * SIZE_FILE * SIZE_FILE, 
   },
 });
 

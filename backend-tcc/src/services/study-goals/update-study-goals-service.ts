@@ -35,7 +35,7 @@ export class UpdateStudyGoalsService {
       .execute();
 
     if (existing.length === 0) {
-      throw new NotFoundError("Study goals not found for this user");
+      throw new NotFoundError();
     }
 
     // Preparar dados para atualização (apenas campos fornecidos)

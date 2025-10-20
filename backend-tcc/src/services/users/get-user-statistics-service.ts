@@ -19,6 +19,18 @@ type RecentActivity = {
   study_time_minutes: number;
 };
 
+type UpcomingReviewMaterial = {
+  material_id: string;
+  material_title: string;
+  flashcards_count: number;
+};
+
+type UpcomingReview = {
+  date: string;
+  flashcards_due: number;
+  materials: UpcomingReviewMaterial[];
+};
+
 type GetUserStatisticsResponse = {
   total_materials: number;
   total_flashcards: number;
@@ -47,6 +59,7 @@ type GetUserStatisticsResponse = {
     average_time_per_quiz: number;
   };
   recent_activity: RecentActivity[];
+  upcoming_reviews: UpcomingReview[];
 };
 
 export class GetUserStatisticsService {
@@ -76,15 +89,7 @@ export class GetUserStatisticsService {
 
     const todayBrasil = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    // DEBUG - Remover depois
-    console.log('=== DEBUG TIMEZONE ===');
-    console.log('Agora UTC:', now.toISOString());
-    console.log('Agora Brasil:', nowBrasil.toISOString());
-    console.log('Data Brasil:', todayBrasil);
-    console.log('Início do dia UTC:', startOfDayUTC.toISOString());
-    console.log('Fim do dia UTC:', endOfDayUTC.toISOString());
-    console.log('====================');
-
+  
     // 1. Total de materiais do usuário
     const materialsCount = await db
       .select({ total: count() })
@@ -122,7 +127,6 @@ export class GetUserStatisticsService {
       )
       .execute();
     const flashcardsReviewedToday = flashcardsToday[0]?.total || 0;
-    console.log('Flashcards revisados hoje:', flashcardsReviewedToday);
 
     // 5. Quizzes respondidos hoje (comparando com timestamps UTC calculados)
     const quizzesToday = await db
@@ -137,7 +141,6 @@ export class GetUserStatisticsService {
       )
       .execute();
     const quizzesCompletedToday = quizzesToday[0]?.total || 0;
-    console.log('Quizzes completados hoje:', quizzesCompletedToday);
 
     // 6. Total de dias únicos com atividade
     // Usar timezone América/São_Paulo para conversão correta
@@ -216,6 +219,9 @@ export class GetUserStatisticsService {
     // 10. Atividade recente (últimos 7 dias)
     const recentActivity = await this.getRecentActivity(userId, 7);
 
+    // 11. Próximas revisões (próximos 30 dias)
+    const upcomingReviews = await this.getUpcomingReviews(userId, 30);
+
     return {
       total_materials: totalMaterials,
       total_flashcards: totalFlashcards,
@@ -239,6 +245,7 @@ export class GetUserStatisticsService {
         average_time_per_quiz: 0, // TODO: Implementar se houver campo de tempo
       },
       recent_activity: recentActivity,
+      upcoming_reviews: upcomingReviews,
     };
   }
 
@@ -405,6 +412,67 @@ export class GetUserStatisticsService {
     }
 
     return Array.from(activityMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
+  }
+
+  private async getUpcomingReviews(
+    userId: string,
+    days: number
+  ): Promise<UpcomingReview[]> {
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + days);
+
+    // Buscar flashcards com next_review agendado nos próximos N dias, com informações do material
+    const upcomingFlashcards = await db
+      .select({
+        date: sql<string>`DATE(${flashcards.next_review} AT TIME ZONE 'America/Sao_Paulo')`,
+        material_id: flashcards.material_id,
+        material_title: materials.title,
+        count: count(),
+      })
+      .from(flashcards)
+      .innerJoin(materials, eq(flashcards.material_id, materials.id))
+      .where(
+        and(
+          eq(flashcards.user_id, userId),
+          gte(flashcards.next_review, today),
+          lte(flashcards.next_review, endDate)
+        )
+      )
+      .groupBy(
+        sql`DATE(${flashcards.next_review} AT TIME ZONE 'America/Sao_Paulo')`,
+        flashcards.material_id,
+        materials.title
+      )
+      .execute();
+
+    // Agrupar por data e material
+    const reviewsMap = new Map<string, UpcomingReview>();
+
+    for (const review of upcomingFlashcards) {
+      const existing = reviewsMap.get(review.date);
+
+      const materialInfo: UpcomingReviewMaterial = {
+        material_id: review.material_id,
+        material_title: review.material_title,
+        flashcards_count: review.count,
+      };
+
+      if (existing) {
+        existing.flashcards_due += review.count;
+        existing.materials.push(materialInfo);
+      } else {
+        reviewsMap.set(review.date, {
+          date: review.date,
+          flashcards_due: review.count,
+          materials: [materialInfo],
+        });
+      }
+    }
+
+    return Array.from(reviewsMap.values()).sort((a, b) =>
       a.date.localeCompare(b.date)
     );
   }

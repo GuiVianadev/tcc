@@ -86,6 +86,7 @@ export class GetUsersRankingService {
       if (b.total_study_days !== a.total_study_days) {
         return b.total_study_days - a.total_study_days;
       }
+      return 0;
     });
 
     return { users: finalRanking };
