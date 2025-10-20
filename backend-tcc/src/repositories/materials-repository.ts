@@ -22,7 +22,7 @@ export type CreateMaterialWithContent = {
 export type MaterialsRepository = {
   create(
     data: InferInsertModel<typeof materials>
-  ): Promise<InferInsertModel<typeof materials>>;
+  ): Promise<InferSelectModel<typeof materials>>;
   createWithContent(data: CreateMaterialWithContent): Promise<{
     material: InferSelectModel<typeof materials>;
     summary: {

@@ -16,8 +16,14 @@ const textSchema = z.object({
 // Schema para quando o conteúdo vem como arquivo (multipart)
 const fileSchema = z.object({
   title: z.string().min(3).max(200),
-  flashcardsQuantity: z.coerce.number().int().min(5).max(20).optional(),
-  quizzesQuantity: z.coerce.number().int().min(3).max(15).optional(),
+  flashcardsQuantity: z.preprocess(
+    (val) => (val === undefined || val === "" || val === null ? undefined : Number(val)),
+    z.number().int().min(5).max(20).optional()
+  ),
+  quizzesQuantity: z.preprocess(
+    (val) => (val === undefined || val === "" || val === null ? undefined : Number(val)),
+    z.number().int().min(3).max(15).optional()
+  ),
 });
 
 const ALLOWED_MIME_TYPES = [

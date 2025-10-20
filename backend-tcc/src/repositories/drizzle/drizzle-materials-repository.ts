@@ -18,7 +18,7 @@ const RECENT_MATERIALS = 2;
 export class DrizzleMaterialsRepository implements MaterialsRepository {
   async create(
     data: InferInsertModel<typeof materials>
-  ): Promise<InferInsertModel<typeof materials>> {
+  ): Promise<InferSelectModel<typeof materials>> {
     const [createdMaterial] = await db
       .insert(materials)
       .values(data)

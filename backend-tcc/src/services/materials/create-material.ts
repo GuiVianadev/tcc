@@ -18,6 +18,22 @@ type CreateMaterialRequest = {
   quizzesQuantity?: number;
 };
 
+type AIGeneratedContent = {
+  summary: string;
+  flashcards: Array<{
+    question: string;
+    answer: string;
+  }>;
+  quizzes: Array<{
+    question: string;
+    options: Array<{
+      id: "a" | "b" | "c" | "d";
+      text: string;
+    }>;
+    correct_answer: "a" | "b" | "c" | "d";
+  }>;
+};
+
 export class CreateMaterialService {
   private readonly materialRepository: MaterialsRepository;
   private readonly userRepository: UserRepository;
@@ -53,7 +69,7 @@ export class CreateMaterialService {
     });
 
     // 5. Gera conteúdo com IA
-    let aiResponse;
+    let aiResponse: AIGeneratedContent;
     try {
       if (request.topic) {
         // ✅ Tópico/prompt curto
@@ -88,6 +104,12 @@ export class CreateMaterialService {
           ? error.message
           : "Falha ao gerar conteúdo com IA"
       );
+    }
+
+    // Verificar se o conteúdo foi gerado
+    if (!aiResponse!) {
+      await this.materialRepository.deleteMaterial(material.id);
+      throw new Error("Nenhum conteúdo foi gerado pela IA");
     }
 
     // 6. Salva tudo em transação
