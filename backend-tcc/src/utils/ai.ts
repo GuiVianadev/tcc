@@ -4,12 +4,12 @@ import { z } from "zod";
 
 const MAX_QUESTION = 500;
 const MAX_ANSWER = 1000;
-const MIN_SUMMARY = 100;
-const MAX_SUMMARY = 1000;
+const MIN_SUMMARY = 1000;
+const MAX_SUMMARY = 8000;
 
 const flashcardSchema = z.object({
   question: z.string().min(10).max(MAX_QUESTION),
-  answer: z.string().min(10).max(MAX_ANSWER),
+  answer: z.string().min(5).max(MAX_ANSWER),
 });
 
 const quizSchema = z.object({
@@ -18,7 +18,7 @@ const quizSchema = z.object({
     .array(
       z.object({
         id: z.enum(["a", "b", "c", "d"]),
-        text: z.string().min(1).max(MAX_QUESTION), // Reduzido de 5 para 1 (aceita "Sim", "Não", etc)
+        text: z.string().min(1).max(MAX_QUESTION), 
       })
     )
     .length(4),
@@ -29,15 +29,15 @@ const aiResponseSchema = z.object({
   summary: z
     .string()
     .min(MIN_SUMMARY)
-    .max(MAX_SUMMARY * 4), // Aumentado para 2000 caracteres
+    .max(MAX_SUMMARY), 
   flashcards: z.array(flashcardSchema).min(5).max(20),
-  quizzes: z.array(quizSchema).min(10).max(15), // Limite do Gemini para evitar timeout
+  quizzes: z.array(quizSchema).min(10).max(15), 
 });
 
 export type AIResponse = z.infer<typeof aiResponseSchema>;
 
-const DEFAULT_FLASHCARDS = 10;
-const DEFAULT_QUIZZES = 15; // Fixo em 30 para evitar timeout do Gemini (3 sessões x 10 questões)
+const DEFAULT_FLASHCARDS = 15;
+const DEFAULT_QUIZZES = 15;
 
 type GenerateOptions = {
   flashcardsQuantity?: number;
@@ -63,7 +63,6 @@ async function generateFromText(
     quizzesQuantity = DEFAULT_QUIZZES,
   } = options;
 
-  // Aceita tópicos curtos - IA irá expandir o conteúdo
   const prompt = buildPrompt(flashcardsQuantity, quizzesQuantity);
 
   try {
@@ -76,7 +75,7 @@ async function generateFromText(
         },
       ],
       schema: aiResponseSchema,
-      temperature: 0.7,
+      temperature: 0.5, 
     });
 
     return result.object;
@@ -132,7 +131,7 @@ async function generateFromFile(
         },
       ],
       schema: aiResponseSchema,
-      temperature: 0.7,
+      temperature: 0.5,
     });
 
     return result.object;
@@ -142,34 +141,29 @@ async function generateFromFile(
 }
 
 function buildPrompt(flashcardsQty: number, quizzesQty: number): string {
-  return `Você é um especialista em educação e criação de materiais de estudo de alta qualidade.
+  return `Você é um especialista em educação. Analise o conteúdo e gere:
 
-Analise o conteúdo fornecido e gere:
-
-1. **RESUMO** (200-400 palavras):
-   - Capture os conceitos principais
-   - Seja conciso mas completo
-   - Use linguagem clara e objetiva
-   - Organize em parágrafos lógicos
-   - Gere em formato markdown
+1. **RESUMO** (600-800 palavras):
+   - Use markdown (##, ###, **negrito** para termos-chave, \`\`\` para código)
+   - Estrutura: Introdução → Conceitos principais → Exemplos práticos → Conclusão
+   - Seja técnico, preciso e organizado
 
 2. **${flashcardsQty} FLASHCARDS**:
-   - Foque nos conceitos mais importantes
    - Perguntas claras e objetivas
-   - Respostas completas mas concisas
-   - Varie entre definições, exemplos e aplicações
-   - Evite perguntas muito óbvias ou muito complexas
+   - Respostas completas mas concisas (2-4 linhas)
+   - Varie: definições, comparações, casos de uso, exemplos práticos
+   - Dificuldade progressiva (básico → intermediário)
 
 3. **${quizzesQty} QUESTÕES DE MÚLTIPLA ESCOLHA**:
-   - Teste compreensão profunda do conteúdo
-   - 4 alternativas (a, b, c, d)
-   - Apenas 1 alternativa correta
-   - Distratores plausíveis (não óbvios)
-   - Varie a dificuldade (fácil, médio, difícil)
+   - 4 alternativas (a, b, c, d), apenas 1 correta
+   - Distratores plausíveis baseados em erros comuns
+   - Dificuldade: ${Math.ceil(quizzesQty * 0.3)} fáceis, ${Math.floor(quizzesQty * 0.5)} médias, ${Math.floor(quizzesQty * 0.2)} difíceis
+   - Varie formatos: cenários práticos, análise de código, questões conceituais
 
-**IMPORTANTE:**
-- Use português brasileiro correto
-- Seja preciso e educacional
+**REGRAS:**
+- Use português brasileiro formal
 - Baseie-se APENAS no conteúdo fornecido
-- Para arquivos: extraia TODO o texto, incluindo tabelas e imagens (quando aplicável)`;
+- Para arquivos: extraia TODO o texto (tabelas, diagramas, legendas)
+- NÃO use referências como "Figura 2 do material"
+- Formatação Markdown consistente`;
 }
