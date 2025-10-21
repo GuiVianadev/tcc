@@ -209,7 +209,7 @@ export function MaterialFlashcards() {
                   key={btn.difficulty}
                   onClick={() => submitReview(btn.difficulty)}
                   disabled={isReviewing}
-                  className={`${btn.color} text-white h-auto py-4 flex flex-col items-center gap-1`}
+                  className={`${btn.color} text-white h-auto py-4 flex flex-col items-center gap-1 truncate`}
                 >
                   <span className="font-bold">{btn.label}</span>
                   <span className="text-xs opacity-90">{btn.description}</span>
