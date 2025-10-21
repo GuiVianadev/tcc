@@ -20,7 +20,6 @@ export default defineConfig({
   },
   build: {
     sourcemap: false,
-    minify: "terser",
     rollupOptions: {
       output: {
         manualChunks: {
