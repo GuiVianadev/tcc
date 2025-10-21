@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "tsx --env-file .env --experimental-strip-types --no-warnings --watch src/server.ts",
-    "build": "tsup src --out-dir build && tsup --config tsup.seed.config.ts",
+    "build": "tsup",
     "build:watch": "tsc --watch",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

@@ -1,20 +1,31 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/**/*.ts"],
+  entry: {
+    server: "src/server.ts",
+    seed: "src/db/seed.ts",
+  },
   splitting: false,
-  sourcemap: false,
+  sourcemap: true, // ✅ Sourcemaps para debug
   clean: true,
   outDir: "build",
   format: ["cjs"],
-  bundle: false,
-  skipNodeModulesBundle: true,
+  bundle: true, // ✅ Fazer bundle do código do projeto
+  external: [
+    // ✅ Externalizar todas as dependências principais
+    "fastify",
+    "@fastify/*",
+    "drizzle-orm",
+    "pg",
+    "bcryptjs",
+    "dotenv",
+    "zod",
+    "dayjs",
+    "@ai-sdk/google",
+    "ai",
+  ],
   target: "node18",
   minify: false,
   shims: true,
-  noExternal: [],
   outExtension: () => ({ js: ".cjs" }),
-  esbuildOptions(options) {
-    options.resolveExtensions = [".ts", ".js", ".cjs"];
-  },
 });
