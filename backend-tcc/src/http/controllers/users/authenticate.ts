@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
+import { env } from "@/env/index.ts";
 import { InvalidCredentialsError } from "../../../services/errors/invalid-credentials-error.ts";
 import { makeAutheticateUser } from "../../../services/factories/user/make-authenticate.ts";
 import { UserDisabledError } from "@/services/errors/user-desactived-errors.ts";
@@ -51,8 +52,8 @@ export async function autheticate(
     return reply
       .setCookie("refreshToken", refreshToken, {
         path: "/",
-        secure: true,
-        sameSite: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
         httpOnly: true,
       })
       .status(OK)

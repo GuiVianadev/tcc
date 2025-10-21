@@ -7,8 +7,8 @@ export function logout(request: FastifyRequest, reply: FastifyReply) {
   return reply
     .clearCookie("refreshToken", {
       path: "/",
-      secure: true,
-      sameSite: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       httpOnly: true,
     })
     .status(OK)
