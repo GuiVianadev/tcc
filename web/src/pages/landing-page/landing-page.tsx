@@ -24,7 +24,7 @@ export function LandingPage() {
                 </nav>
 
                 <div className="max-w-7xl mx-auto z-50 w-full pt-32 pb-16 flex flex-col items-center text-center">
-                    <div className="mb-15">
+                    <div className="mb-20">
                         <div className="text-white max-w-2xl flex flex-col gap-3 p-2">
                             <h1 className="text-[3.40rem] leading-none font-bold tracking-tighter text-balance sm:text-7xl">O reforço <span className="text-orange-500 font-merri font-bold">perfeito</span> para seus estudos</h1>
                             <p className="text-base text-zinc-400 sm:text-lg"><p className="text-orange-500 font-">Passa horas estudando e sente que nada fica na cabeça? </p>O Cognitio AI usa inteligência artificial para transformar seus materiais em um plano de estudos ativo que garante a fixação do conteúdo.</p>

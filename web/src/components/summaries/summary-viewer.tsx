@@ -73,13 +73,18 @@ export function SummaryViewer({
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="prose prose-sm leading-relaxed max-w-none dark:prose-invert prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:leading-loose prose-pre:bg-muted prose-pre:text-muted-foreground
-          overflow-x-auto break-words overflow-wrap-anywhere
-          prose-pre:max-w-full prose-pre:overflow-x-auto
-          prose-code:break-words
-          prose-table:block prose-table:max-w-full prose-table:overflow-x-auto
-          [&_*]:max-w-full">
+      <CardContent className="overflow-hidden px-4 sm:px-6">
+        <div className="prose prose-sm leading-relaxed w-full max-w-full dark:prose-invert
+          prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
+          prose-p:leading-loose prose-p:break-words prose-p:w-full
+          prose-pre:bg-muted prose-pre:text-muted-foreground prose-pre:p-3 prose-pre:rounded-lg
+          prose-pre:w-full prose-pre:max-w-full prose-pre:overflow-x-auto
+          prose-code:text-sm prose-code:break-words
+          prose-table:block prose-table:w-full prose-table:max-w-full prose-table:overflow-x-auto
+          [&_pre]:w-full [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:box-border
+          [&_pre_code]:whitespace-pre [&_pre_code]:text-sm
+          [&_p_code]:break-words [&_p_code]:whitespace-normal
+          [&_*]:max-w-full break-words">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       </CardContent>

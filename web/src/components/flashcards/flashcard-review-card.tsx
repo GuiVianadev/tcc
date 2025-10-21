@@ -44,23 +44,23 @@ export function FlashcardReviewCard({
       >
         {/* Frente do Card - Pergunta */}
         <Card
-          className={`absolute inset-0 backface-hidden ${isFlipped ? "invisible" : "visible"
+          className={`absolute inset-0 backface-hidden overflow-hidden ${isFlipped ? "invisible" : "visible"
             }`}
           style={{ backfaceVisibility: "hidden" }}
         >
-          <CardContent className="flex flex-col items-center justify-center h-full p-8 space-y-4">
-            <Badge variant="outline" className="mb-4">
+          <CardContent className="flex flex-col items-center justify-center h-full p-4 sm:p-8 space-y-4 overflow-y-auto">
+            <Badge variant="outline" className="mb-4 flex-shrink-0">
               {flashcard.material_title || "Material"}
             </Badge>
-            <div className="text-center space-y-2 w-full">
+            <div className="text-center space-y-2 w-full max-w-full overflow-hidden">
               <p className="text-sm text-muted-foreground uppercase tracking-wide">
                 Pergunta
               </p>
-              <h2 className="text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere">
+              <h2 className="text-xl sm:text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere word-break">
                 {flashcard.question}
               </h2>
             </div>
-            <p className="text-sm text-muted-foreground mt-8">
+            <p className="text-sm text-muted-foreground mt-8 flex-shrink-0">
               Clique para ver a resposta
             </p>
           </CardContent>
@@ -68,27 +68,27 @@ export function FlashcardReviewCard({
 
         {/* Verso do Card - Resposta */}
         <Card
-          className={`absolute inset-0 backface-hidden bg-primary/5 ${isFlipped ? "visible" : "invisible"
+          className={`absolute inset-0 backface-hidden bg-primary/5 overflow-hidden ${isFlipped ? "visible" : "invisible"
             }`}
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
           }}
         >
-          <CardContent className="flex flex-col items-center justify-center h-full p-8 space-y-4">
-            <Badge variant="outline" className="mb-4">
+          <CardContent className="flex flex-col items-center justify-center h-full p-4 sm:p-8 space-y-4 overflow-y-auto">
+            <Badge variant="outline" className="mb-4 flex-shrink-0">
               {flashcard.material_title || "Material"}
             </Badge>
-            <div className="text-center space-y-2 w-full">
+            <div className="text-center space-y-2 w-full max-w-full overflow-hidden">
               <p className="text-sm text-muted-foreground uppercase tracking-wide">
                 Resposta
               </p>
-              <h2 className="text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere whitespace-pre-wrap">
+              <h2 className="text-xl sm:text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere whitespace-pre-wrap word-break">
                 {flashcard.answer}
               </h2>
             </div>
-            <div className="mt-8 pt-4 border-t w-full text-center">
-              <p className="text-sm text-muted-foreground break-words overflow-wrap-anywhere">
+            <div className="mt-4 sm:mt-8 pt-4 border-t w-full max-w-full text-center overflow-hidden flex-shrink-0">
+              <p className="text-sm text-muted-foreground break-words overflow-wrap-anywhere word-break">
                 Pergunta: {flashcard.question}
               </p>
             </div>
@@ -108,6 +108,10 @@ export function FlashcardReviewCard({
         }
         .rotate-y-180 {
           transform: rotateY(180deg);
+        }
+        .word-break {
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
       `}</style>
     </div>
