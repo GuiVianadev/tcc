@@ -13,4 +13,8 @@ export default defineConfig({
   minify: false,
   shims: true,
   noExternal: [],
+  outExtension: () => ({ js: ".cjs" }),
+  esbuildOptions(options) {
+    options.resolveExtensions = [".ts", ".js", ".cjs"];
+  },
 });
