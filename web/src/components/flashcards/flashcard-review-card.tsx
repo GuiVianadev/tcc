@@ -32,7 +32,7 @@ export function FlashcardReviewCard({
   onClick,
 }: FlashcardReviewCardProps) {
   return (
-    <div className="perspective-1000 w-full max-w-2xl mx-auto">
+    <div className="perspective-1000 w-full max-w-2xl mx-auto px-4">
       <div
         className={`relative w-full h-96 cursor-pointer transition-transform duration-500 transform-style-3d ${isFlipped ? "rotate-y-180" : ""
           }`}
@@ -52,11 +52,11 @@ export function FlashcardReviewCard({
             <Badge variant="outline" className="mb-4">
               {flashcard.material_title || "Material"}
             </Badge>
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-2 w-full">
               <p className="text-sm text-muted-foreground uppercase tracking-wide">
                 Pergunta
               </p>
-              <h2 className="text-2xl font-semibold leading-relaxed">
+              <h2 className="text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere">
                 {flashcard.question}
               </h2>
             </div>
@@ -79,16 +79,16 @@ export function FlashcardReviewCard({
             <Badge variant="outline" className="mb-4">
               {flashcard.material_title || "Material"}
             </Badge>
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-2 w-full">
               <p className="text-sm text-muted-foreground uppercase tracking-wide">
                 Resposta
               </p>
-              <h2 className="text-2xl font-semibold leading-relaxed">
+              <h2 className="text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere whitespace-pre-wrap">
                 {flashcard.answer}
               </h2>
             </div>
             <div className="mt-8 pt-4 border-t w-full text-center">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground break-words overflow-wrap-anywhere">
                 Pergunta: {flashcard.question}
               </p>
             </div>

@@ -74,7 +74,12 @@ export function SummaryViewer({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm leading-relaxed max-w-none dark:prose-invert prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:leading-loose prose-pre:bg-muted prose-pre:text-muted-foreground">
+        <div className="prose prose-sm leading-relaxed max-w-none dark:prose-invert prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:leading-loose prose-pre:bg-muted prose-pre:text-muted-foreground
+          overflow-x-auto break-words overflow-wrap-anywhere
+          prose-pre:max-w-full prose-pre:overflow-x-auto
+          prose-code:break-words
+          prose-table:block prose-table:max-w-full prose-table:overflow-x-auto
+          [&_*]:max-w-full">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       </CardContent>

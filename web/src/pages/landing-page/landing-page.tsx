@@ -7,7 +7,7 @@ import IconLogo from "../../assets/icon-logo.svg?react"
 export function LandingPage() {
     return (
         <div className="bg-zinc-950">
-            <img className="absolute mx-auto top-0 left-1/2 transform -translate-x-1/2 z-0  object-contain" src="./src/assets/top.webp" alt="" />
+            <img className="absolute mx-auto top-0 left-1/2 transform -translate-x-1/2 z-0  object-contain" src="/images/top.webp" alt="Background decoration" />
             <main className="h-screen flex flex-col py-10 z-10 mx-auto ">
                 <nav className="max-w-7xl mx-auto w-full px-5 sm:px-6 lg:px-8 flex justify-between z-50  backdrop-blur">
                     <div>
@@ -35,7 +35,7 @@ export function LandingPage() {
                     </div>
 
                     <div className="h-[232px] relative hidden sm:block p-2">
-                        <img src="./src/assets/dash.webp" alt="" />
+                        <img src="/images/dash.webp" alt="Dashboard preview" />
                     </div>
                 </div>
 
@@ -51,7 +51,7 @@ export function LandingPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 p-3 gap-4 max-w-7xl mx-auto">
 
                         <div className="flex flex-col overflow-hidden border border-zinc-800 rounded-lg bg-white/[0.02]">
-                            <img loading="lazy" src="./src/assets/generatemateriais.webp" alt="" />
+                            <img loading="lazy" src="/images/generatemateriais.webp" alt="Upload de materiais" />
                             <div className="p-5 flex flex-col gap-3 border-t border-zinc-800">
                                 <h1 className="text-base font-medium inline-flex items-center gap-2 text-white">Envie seu Material ou Tópico</h1>
                                 <p className="text-zinc-400 text-sm leading-relaxed">Faça o upload do PDF da aula, artigos, anotações ou tópico. Nossa IA vai ler e entender os pontos principais para você.</p>
@@ -62,10 +62,10 @@ export function LandingPage() {
                                 <h1 className="text-base font-medium inline-flex items-center gap-2 text-white">A IA cria suas ferramentas</h1>
                                 <p className="text-zinc-400 text-sm leading-relaxed">Em segundos, receba quizzes para testar seu conhecimento e flashcards para memorizar a longo prazo.</p>
                             </div>
-                            <img loading="lazy" src="./src/assets/quizz.webp" alt="" />
+                            <img loading="lazy" src="/images/quizz.webp" alt="Quiz gerado pela IA" />
                         </div>
                         <div className="flex flex-col overflow-hidden border border-zinc-800 rounded-lg bg-white/[0.02]">
-                            <img loading="lazy" src="./src/assets/dashandcalendar.webp" alt="" />
+                            <img loading="lazy" src="/images/dashandcalendar.webp" alt="Dashboard e calendário de estudos" />
                             <div className="p-5 flex flex-col gap-3  border-t border-zinc-800">
                                 <h1 className="text-base font-medium inline-flex items-center gap-2 text-white">Estude e veja seu progresso</h1>
                                 <p className="text-zinc-400 text-sm leading-relaxed">Siga seu plano de revisão, mantenha o foco com a consistência e acompanhe seu progresso em cada Conteúdo.</p>

@@ -61,7 +61,7 @@ export function SignIn() {
     .filter(Boolean);
 
   return (
-    <div className="p-8 w-[460px]">
+    <div className="p-8 w-full max-w-[460px]">
       <div className="flex  flex-col justify-center gap-6 pb-6">
         <div className="flex gap-2 font-semibold justify-between items-center">
           <div>
