@@ -6,6 +6,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(DEFAULT_PORT),
   JWT_SECRET: z.string(),
   DATABASE_URL: z.string(),
+  FRONTEND_URL: z.string().optional(), // URL do frontend para CORS em produção
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(), // Chave da API do Gemini
 });
 
 const _env = envSchema.safeParse(process.env);

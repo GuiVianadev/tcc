@@ -13,8 +13,34 @@ import { userRoutes } from "./http/controllers/users/routes.ts";
 
 export const app = fastify();
 
+// Configuração de CORS para desenvolvimento e produção
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:5174",
+];
+
+// Adiciona URL de produção se estiver configurada
+if (env.FRONTEND_URL) {
+  allowedOrigins.push(env.FRONTEND_URL);
+}
+
 app.register(cors, {
-  origin: "http://localhost:5173",
+  origin: (origin, callback) => {
+    // Permite requisições sem origin (ex: Postman, curl, SSR)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    // Verifica se a origin está na lista permitida
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+    }
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
