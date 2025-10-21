@@ -53,7 +53,7 @@ export async function autheticate(
       .setCookie("refreshToken", refreshToken, {
         path: "/",
         secure: env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: env.NODE_ENV === "production" ? "none" : "lax",
         httpOnly: true,
       })
       .status(OK)
