@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq } from "drizzle-orm";
 import { hash } from "bcryptjs";
-import { users } from "./schema.ts";
+import { users } from "./schema.js";
 import dotenv from "dotenv";
 
 dotenv.config();
