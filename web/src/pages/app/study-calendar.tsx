@@ -316,7 +316,7 @@ export function StudyCalendar() {
 
                       {/* Indicador de revisões pendentes */}
                       {reviewCount > 0 && (
-                        <div className="absolute bottom-0.5 right-0.5">
+                        <div className="absolute bottom-6 right-3.5 md:bottom-0.5 md:right-0.5">
                           <div className={`
                             w-5 h-4 rounded-full flex items-center justify-center text-[10px] font-bold
                             ${reviewCount >= 10 ? 'bg-red-500 text-white' :
