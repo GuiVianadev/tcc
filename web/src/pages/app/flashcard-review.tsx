@@ -29,8 +29,8 @@ export function FlashcardReview() {
   const flashcardsArray: Flashcard[] = Array.isArray(dueFlashcards)
     ? dueFlashcards
     : (dueFlashcards as any)?.flashcards
-    ? (dueFlashcards as any).flashcards
-    : [];
+      ? (dueFlashcards as any).flashcards
+      : [];
 
   const {
     currentFlashcard,
@@ -209,10 +209,14 @@ export function FlashcardReview() {
                   key={btn.difficulty}
                   onClick={() => submitReview(btn.difficulty)}
                   disabled={isReviewing}
-                  className={`${btn.color} text-white h-auto py-4 flex flex-col items-center gap-1`}
+                  className={`${btn.color} text-white h-auto py-3 sm:py-4 flex flex-col items-center gap-1 min-w-0`}
                 >
-                  <span className="font-bold">{btn.label}</span>
-                  <span className="text-xs opacity-90">{btn.description}</span>
+                  <span className="font-bold text-sm sm:text-base break-words text-center w-full px-1">
+                    {btn.label}
+                  </span>
+                  <span className="text-xs opacity-90 break-words text-center w-full px-1 leading-tight">
+                    {btn.description}
+                  </span>
                 </Button>
               ))}
             </div>

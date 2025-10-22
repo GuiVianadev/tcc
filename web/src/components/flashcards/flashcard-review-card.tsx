@@ -44,23 +44,25 @@ export function FlashcardReviewCard({
       >
         {/* Frente do Card - Pergunta */}
         <Card
-          className={`absolute inset-0 backface-hidden overflow-hidden ${isFlipped ? "invisible" : "visible"
+          className={`absolute inset-0 backface-hidden ${isFlipped ? "invisible" : "visible"
             }`}
           style={{ backfaceVisibility: "hidden" }}
         >
-          <CardContent className="flex flex-col items-center justify-center h-full p-4 sm:p-8 space-y-4 overflow-y-auto">
-            <Badge variant="outline" className="mb-4 flex-shrink-0">
+          <CardContent className="flex flex-col h-full p-4 sm:p-6 overflow-y-auto">
+            <Badge variant="outline" className="mb-4 flex-shrink-0 self-center">
               {flashcard.material_title || "Material"}
             </Badge>
-            <div className="text-center space-y-2 w-full max-w-full overflow-hidden">
-              <p className="text-sm text-muted-foreground uppercase tracking-wide">
-                Pergunta
-              </p>
-              <h2 className="text-xl sm:text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere word-break">
-                {flashcard.question}
-              </h2>
+            <div className="flex-1 flex flex-col items-center justify-center min-h-0 overflow-y-auto">
+              <div className="text-center space-y-2 w-full px-2">
+                <p className="text-sm text-muted-foreground uppercase tracking-wide">
+                  Pergunta
+                </p>
+                <h2 className="text-xl sm:text-2xl font-semibold break-words hyphens-auto word-break">
+                  {flashcard.question}
+                </h2>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-8 flex-shrink-0">
+            <p className="text-sm text-muted-foreground mt-4 flex-shrink-0 text-center">
               Clique para ver a resposta
             </p>
           </CardContent>
@@ -68,27 +70,29 @@ export function FlashcardReviewCard({
 
         {/* Verso do Card - Resposta */}
         <Card
-          className={`absolute inset-0 backface-hidden bg-primary/5 overflow-hidden ${isFlipped ? "visible" : "invisible"
+          className={`absolute inset-0 backface-hidden bg-primary/5 ${isFlipped ? "visible" : "invisible"
             }`}
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
           }}
         >
-          <CardContent className="flex flex-col items-center justify-center h-full p-4 sm:p-8 space-y-4 overflow-y-auto">
-            <Badge variant="outline" className="mb-4 flex-shrink-0">
+          <CardContent className="flex flex-col h-full p-4 sm:p-6 overflow-y-auto">
+            <Badge variant="outline" className="mb-4 flex-shrink-0 self-center">
               {flashcard.material_title || "Material"}
             </Badge>
-            <div className="text-center space-y-2 w-full max-w-full overflow-hidden">
-              <p className="text-sm text-muted-foreground uppercase tracking-wide">
-                Resposta
-              </p>
-              <h2 className="text-xl sm:text-2xl font-semibold leading-relaxed break-words hyphens-auto overflow-wrap-anywhere whitespace-pre-wrap word-break">
-                {flashcard.answer}
-              </h2>
+            <div className="flex-1 flex flex-col items-center justify-center min-h-0 overflow-y-auto">
+              <div className="text-center space-y-2 w-full px-2">
+                <p className="text-sm text-muted-foreground uppercase tracking-wide">
+                  Resposta
+                </p>
+                <h2 className="text-xl sm:text-2xl font-semibold break-words hyphens-auto whitespace-pre-wrap word-break">
+                  {flashcard.answer}
+                </h2>
+              </div>
             </div>
-            <div className="mt-4 sm:mt-8 pt-4 border-t w-full max-w-full text-center overflow-hidden flex-shrink-0">
-              <p className="text-sm text-muted-foreground break-words overflow-wrap-anywhere word-break">
+            <div className="mt-4 pt-4 border-t w-full text-center flex-shrink-0">
+              <p className="text-sm text-muted-foreground break-words word-break px-2">
                 Pergunta: {flashcard.question}
               </p>
             </div>

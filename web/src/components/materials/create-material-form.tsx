@@ -52,9 +52,34 @@ export function CreateMaterialForm() {
           setFile(null);
           alert("Material criado com sucesso!");
         },
-        onError: (error) => {
-          console.error(error);
-          alert("Erro ao criar material");
+        onError: (error: any) => {
+          console.error("Erro ao criar material:", error);
+
+          // Tratamento específico para erro de IA sobrecarregada
+          const errorMessage = error?.response?.data?.message || error?.message || "";
+          const statusCode = error?.response?.status;
+
+          if (statusCode === 503 || errorMessage.toLowerCase().includes("overload")) {
+            alert(
+              "A IA está temporariamente sobrecarregada. Por favor, aguarde alguns minutos e tente novamente.\n\n" +
+              "Dica: Tente em um horário de menor uso ou reduza o tamanho do conteúdo."
+            );
+          } else if (statusCode === 429) {
+            alert(
+              "Você atingiu o limite de requisições. Por favor, aguarde alguns minutos antes de tentar novamente."
+            );
+          } else if (errorMessage.includes("timeout") || errorMessage.includes("timed out")) {
+            alert(
+              "O processamento está demorando mais que o esperado. Tente novamente com um conteúdo menor ou em outro momento."
+            );
+          } else if (errorMessage) {
+            alert(`Erro ao criar material: ${errorMessage}`);
+          } else {
+            alert(
+              "Erro ao criar material. Verifique sua conexão e tente novamente.\n\n" +
+              "Se o problema persistir, entre em contato com o suporte."
+            );
+          }
         },
       }
     );
