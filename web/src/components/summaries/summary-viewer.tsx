@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import 'github-markdown-css/github-markdown-light.css';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SummaryViewerProps {
@@ -74,17 +75,10 @@ export function SummaryViewer({
         </div>
       </CardHeader>
       <CardContent className="overflow-hidden px-4 sm:px-6">
-        <div className="prose prose-sm leading-relaxed w-full max-w-full dark:prose-invert
-          prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
-          prose-p:leading-loose prose-p:break-words prose-p:w-full
-          prose-pre:bg-muted prose-pre:text-muted-foreground prose-pre:p-3 prose-pre:rounded-lg
-          prose-pre:w-full prose-pre:max-w-full prose-pre:overflow-x-auto
-          prose-code:text-sm prose-code:break-words
-          prose-table:block prose-table:w-full prose-table:max-w-full prose-table:overflow-x-auto
-          [&_pre]:w-full [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:box-border
-          [&_pre_code]:whitespace-pre [&_pre_code]:text-sm
-          [&_p_code]:break-words [&_p_code]:whitespace-normal
-          [&_*]:max-w-full break-words">
+        <div className="markdown-body text-foreground" style={{
+          backgroundColor: 'transparent',
+          color: 'hsl(var(--foreground))'
+        }}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       </CardContent>
