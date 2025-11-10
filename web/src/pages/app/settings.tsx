@@ -1,15 +1,14 @@
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { updateUserProfile } from "@/api/users";
+import { useQuery } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/api/get-profile";
-import { getStudyGoals, updateStudyGoals } from "@/api/study-goals";
+import { getStudyGoals } from "@/api/study-goals";
 import {
   Select,
   SelectContent,
@@ -17,6 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+import { useUpdateProfile } from "@/hooks/use-user";
+import { useUpdateStudyGoals } from "@/hooks/use-study-goals";
 
 
 const MIN_PASSWORD = 8;
@@ -75,7 +77,7 @@ export function Settings() {
     }
   })
 
-  const { register: registerGoals, handleSubmit: studyHandleSubmt, setValue: setGoalValue, formState: { isSubmitting: studySubmitting, errors: studyError } } = useForm<UpdateStudyGoalsForm>({
+  const { register: registerGoals, handleSubmit: studyHandleSubmt, setValue: setGoalValue, watch: watchGoals, formState: { isSubmitting: studySubmitting, errors: studyError } } = useForm<UpdateStudyGoalsForm>({
     resolver: zodResolver(studyGoalsSchema),
     values: {
       area_of_interest: userGoals?.area_of_interest,
@@ -85,12 +87,8 @@ export function Settings() {
   })
 
 
-  const { mutateAsync: updateUser } = useMutation({
-    mutationFn: updateUserProfile,
-  })
-  const { mutateAsync: updateGoal } = useMutation({
-    mutationFn: updateStudyGoals,
-  })
+  const { mutateAsync: updateUser } = useUpdateProfile()
+  const { mutateAsync: updateGoal } = useUpdateStudyGoals()
 
   async function handleUserUpdate(data: UpdateUserForm) {
     try {
@@ -106,9 +104,12 @@ export function Settings() {
         email: data?.email,
         name: fullName,
       })
+
+      toast.success("Perfil atualizado com sucesso!")
     }
     catch (error) {
       console.error("Erro ao atualizar o usuario", error)
+      toast.error("Erro ao atualizar o perfil. Tente novamente.")
     }
   }
   async function handleGoalUpdate(data: UpdateStudyGoalsForm) {
@@ -118,9 +119,12 @@ export function Settings() {
         daily_flashcards_goal: data?.daily_flashcards_goal,
         daily_quizzes_goal: data?.daily_quizzes_goal
       })
+
+      toast.success("Preferências atualizadas com sucesso!")
     }
     catch (error) {
-      console.error("Erro ao atualizar o usuario", error)
+      console.error("Erro ao atualizar as preferências", error)
+      toast.error("Erro ao atualizar as preferências. Tente novamente.")
     }
   }
   const userErrorMessages = Object.values(userError)
@@ -233,8 +237,8 @@ export function Settings() {
                   Área de interesse
                 </Label>
                 <Select
-                  value={userGoals?.area_of_interest || ""}
-                  onValueChange={(value) => setGoalValue("area_of_interest", value)}
+                  value={watchGoals("area_of_interest") || ""}
+                  onValueChange={(value) => setGoalValue("area_of_interest", value, { shouldValidate: true })}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione uma área" />
@@ -256,7 +260,7 @@ export function Settings() {
                   type="number"
                   min={1}
                   max={200}
-                  {...registerGoals("daily_flashcards_goal")}
+                  {...registerGoals("daily_flashcards_goal", { valueAsNumber: true })}
                   placeholder="20"
                 />
 
@@ -268,7 +272,7 @@ export function Settings() {
                   type="number"
                   min={1}
                   max={100}
-                  {...registerGoals("daily_quizzes_goal")}
+                  {...registerGoals("daily_quizzes_goal", { valueAsNumber: true })}
                   placeholder="10"
                 />
               </div>
