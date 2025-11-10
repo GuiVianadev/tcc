@@ -154,7 +154,7 @@ export function CreateMaterial() {
                 className="space-y-4"
               >
                 <div>
-                  <Label htmlFor="topic-title">Título do Material</Label>
+                  <Label htmlFor="topic-title" className="mb-2">Título do Material</Label>
                   <Input
                     id="topic-title"
                     {...topicForm.register("title")}
@@ -163,7 +163,7 @@ export function CreateMaterial() {
                 </div>
 
                 <div>
-                  <Label htmlFor="topic">Tópico ou Prompt</Label>
+                  <Label className="mb-2" htmlFor="topic">Tópico ou Prompt</Label>
                   <Textarea
                     id="topic"
                     {...topicForm.register("topic")}
@@ -223,7 +223,7 @@ export function CreateMaterial() {
                 className="space-y-4"
               >
                 <div>
-                  <Label htmlFor="file-title">Título do Material</Label>
+                  <Label htmlFor="file-title" className="mb-2">Título do Material</Label>
                   <Input
                     id="file-title"
                     {...fileForm.register("title")}

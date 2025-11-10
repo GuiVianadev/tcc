@@ -10,6 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const studyGoalsSchema = z.object({
   area_of_interest: z.string().min(1, "Área de interesse é obrigatória"),
@@ -38,6 +45,7 @@ export function Onboarding() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(studyGoalsSchema),
@@ -90,11 +98,18 @@ export function Onboarding() {
                 <Label htmlFor="area_of_interest">
                   Área de interesse
                 </Label>
-                <Input
-                  id="area_of_interest"
-                  {...register("area_of_interest")}
-                  placeholder="Ex: Programação, Matemática, Inglês..."
-                />
+                <Select onValueChange={(value) => setValue("area_of_interest", value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione uma área" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Tecnologia">Tecnologia</SelectItem>
+                    <SelectItem value="Exatas">Exatas</SelectItem>
+                    <SelectItem value="Humanas">Humanas</SelectItem>
+                    <SelectItem value="Idiomas">Idiomas</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
                 <p className="text-muted-foreground text-xs">
                   Qual área você está estudando?
                 </p>

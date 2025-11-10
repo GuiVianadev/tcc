@@ -143,10 +143,6 @@ export function StudyCalendar() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
 
-  const goToToday = () => {
-    setCurrentDate(new Date());
-  };
-
   // Calcular estatísticas do mês atual
   let monthlyActivities = 0;
   let monthlyDaysStudied = 0;
@@ -235,12 +231,7 @@ export function StudyCalendar() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={goToToday}
-                >
-                  Hoje
-                </Button>
+
                 <Button
                   variant="outline"
                   size="icon"

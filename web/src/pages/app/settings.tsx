@@ -10,6 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/api/get-profile";
 import { getStudyGoals, updateStudyGoals } from "@/api/study-goals";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const MIN_PASSWORD = 8;
@@ -68,7 +75,7 @@ export function Settings() {
     }
   })
 
-  const { register: registerGoals, handleSubmit: studyHandleSubmt, formState: { isSubmitting: studySubmitting, errors: studyError } } = useForm<UpdateStudyGoalsForm>({
+  const { register: registerGoals, handleSubmit: studyHandleSubmt, setValue: setGoalValue, formState: { isSubmitting: studySubmitting, errors: studyError } } = useForm<UpdateStudyGoalsForm>({
     resolver: zodResolver(studyGoalsSchema),
     values: {
       area_of_interest: userGoals?.area_of_interest,
@@ -216,7 +223,7 @@ export function Settings() {
         <Card >
           <CardHeader>
             <CardTitle>
-              Atualizar Preferencias
+              Atualizar Preferências
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -225,11 +232,21 @@ export function Settings() {
                 <Label htmlFor="area_of_interest">
                   Área de interesse
                 </Label>
-                <Input
-                  id="area_of_interest"
-                  {...registerGoals("area_of_interest")}
-                  placeholder="Ex: Programação, Matemática, Inglês..."
-                />
+                <Select
+                  value={userGoals?.area_of_interest || ""}
+                  onValueChange={(value) => setGoalValue("area_of_interest", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione uma área" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Tecnologia">Tecnologia</SelectItem>
+                    <SelectItem value="Exatas">Exatas</SelectItem>
+                    <SelectItem value="Humanas">Humanas</SelectItem>
+                    <SelectItem value="Idiomas">Idiomas</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
 
                 <Label htmlFor="daily_flashcards_goal">
                   Meta diária de flashcards
