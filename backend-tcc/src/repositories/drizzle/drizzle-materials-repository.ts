@@ -90,6 +90,15 @@ export class DrizzleMaterialsRepository implements MaterialsRepository {
       .execute();
     return material;
   }
+
+  async findByTitle(title: string): Promise<InferSelectModel<typeof materials> | null> {
+     const [material] = await db
+      .select()
+      .from(materials)
+      .where(eq(materials.title, title))
+      .execute();
+    return material;
+  }
   async searchManyByUserId(
     userId: string,
     page: number,

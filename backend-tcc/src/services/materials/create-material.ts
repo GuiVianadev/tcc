@@ -6,6 +6,7 @@ import type { MaterialsRepository } from "@/repositories/materials-repository.ts
 import type { UserRepository } from "@/repositories/users-repository.ts";
 import { generateContent } from "../../utils/ai.ts";
 import { NotFoundError } from "../errors/not-found.error.ts";
+import { TitleAlreadyExistsError } from "../errors/title-already-exists-error.ts";
 
 type CreateMaterialRequest = {
   userId: string;
@@ -46,22 +47,23 @@ export class CreateMaterialService {
   }
 
   async execute(request: CreateMaterialRequest) {
-    // 1. Valida usuário
     const user = await this.userRepository.findById(request.userId);
+    const titleAlreadyExists = await this.materialRepository.findByTitle(request.title)
     if (!user) {
       throw new NotFoundError();
     }
+    if(titleAlreadyExists) {
+      throw new TitleAlreadyExistsError();
+    }
 
-    // 2. Valida que tem conteúdo
     if (!(request.topic || request.content || request.fileBuffer)) {
       throw new Error("Forneça conteúdo (tópico, texto ou arquivo)");
     }
+    
 
-    // 3. Determina tipo de conteúdo para salvar no material
     const contentPreview =
       request.topic || request.content || `Arquivo: ${request.mimeType}`;
 
-    // 4. Cria material
     const material = await this.materialRepository.create({
       title: request.title,
       content: contentPreview,
@@ -72,19 +74,16 @@ export class CreateMaterialService {
     let aiResponse: AIGeneratedContent;
     try {
       if (request.topic) {
-        // ✅ Tópico/prompt curto
         aiResponse = await generateContent(request.topic, {
           flashcardsQuantity: request.flashcardsQuantity,
           quizzesQuantity: request.quizzesQuantity,
         });
       } else if (request.content) {
-        // ✅ Texto simples
         aiResponse = await generateContent(request.content, {
           flashcardsQuantity: request.flashcardsQuantity,
           quizzesQuantity: request.quizzesQuantity,
         });
       } else if (request.fileBuffer && request.mimeType) {
-        // ✅ Arquivo (Gemini processa)
         aiResponse = await generateContent(
           {
             buffer: request.fileBuffer,
@@ -97,7 +96,6 @@ export class CreateMaterialService {
         );
       }
     } catch (error) {
-      // Se IA falhar, deleta material
       await this.materialRepository.deleteMaterial(material.id);
       throw new Error(
         error instanceof Error
@@ -106,18 +104,15 @@ export class CreateMaterialService {
       );
     }
 
-    // Verificar se o conteúdo foi gerado
     if (!aiResponse!) {
       await this.materialRepository.deleteMaterial(material.id);
       throw new Error("Nenhum conteúdo foi gerado pela IA");
     }
 
-    // 6. Salva tudo em transação
     let savedSummary, savedFlashcards, savedQuizzes;
 
     try {
       await db.transaction(async (tx) => {
-        // Summary
         [savedSummary] = await tx
           .insert(summaries)
           .values({
@@ -127,7 +122,6 @@ export class CreateMaterialService {
           })
           .returning();
 
-        // Flashcards
         savedFlashcards = await tx
           .insert(flashcards)
           .values(
@@ -140,7 +134,6 @@ export class CreateMaterialService {
           )
           .returning();
 
-        // Quizzes
         savedQuizzes = await tx
           .insert(quizzes)
           .values(
@@ -155,7 +148,6 @@ export class CreateMaterialService {
           .returning();
       });
     } catch (error) {
-      // Se salvar falhar, deleta material
       await this.materialRepository.deleteMaterial(material.id);
       throw new Error("Falha ao salvar conteúdo gerado");
     }
