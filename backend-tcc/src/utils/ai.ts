@@ -1,4 +1,5 @@
 import { google } from "@ai-sdk/google";
+import { groq } from "@ai-sdk/groq";
 import { generateObject } from "ai";
 import { z } from "zod";
 
@@ -18,7 +19,7 @@ const quizSchema = z.object({
     .array(
       z.object({
         id: z.enum(["a", "b", "c", "d"]),
-        text: z.string().min(1).max(MAX_QUESTION), 
+        text: z.string().min(1).max(MAX_QUESTION),
       })
     )
     .length(4),
@@ -26,12 +27,9 @@ const quizSchema = z.object({
 });
 
 const aiResponseSchema = z.object({
-  summary: z
-    .string()
-    .min(MIN_SUMMARY)
-    .max(MAX_SUMMARY), 
+  summary: z.string().min(MIN_SUMMARY).max(MAX_SUMMARY),
   flashcards: z.array(flashcardSchema).min(5).max(20),
-  quizzes: z.array(quizSchema).min(10).max(15), 
+  quizzes: z.array(quizSchema).min(10).max(15),
 });
 
 export type AIResponse = z.infer<typeof aiResponseSchema>;
@@ -65,24 +63,36 @@ async function generateFromText(
 
   const prompt = buildPrompt(flashcardsQuantity, quizzesQuantity);
 
-  try {
-    const result = await generateObject({
-      model: google("gemini-2.0-flash-exp"),
-      messages: [
-        {
-          role: "user",
-          content: `${prompt}\n\n=== TÓPICO/CONTEÚDO ===\n${text}`,
-        },
-      ],
-      schema: aiResponseSchema,
-      temperature: 0.5, 
-    });
+  const textModels = [
+    { provider: groq, model: "moonshotai/kimi-k2-instruct" },
+    { provider: google, model: "gemini-2.0-flash" },
+  ];
 
-    return result.object;
-  } catch (error) {
-    console.error("Erro ao gerar conteúdo com IA:", error);
-    throw new Error("Falha ao processar texto com IA");
+  for (const { provider, model} of textModels) {
+    try {
+      const result = await generateObject({
+        model: provider(model),
+        messages: [
+          {
+            role: "user",
+            content: `${prompt}\n\n=== TÓPICO/CONTEÚDO ===\n${text}`,
+          },
+        ],
+        schema: aiResponseSchema,
+        temperature: 0.5,
+      });
+
+      return result.object;
+    } catch (error) {
+      if (model !== textModels[textModels.length - 1].model) {
+        continue;
+      }
+      
+      throw new Error("Falha ao processar texto com todos os modelos disponíveis");
+    }
   }
+
+  throw new Error("Nenhum modelo disponível para processar texto");
 }
 
 async function generateFromFile(
@@ -104,40 +114,52 @@ async function generateFromFile(
   ];
 
   if (!GEMINI_SUPPORTED.includes(mimeType)) {
-    throw new Error(`Formato não suportado pelo Gemini: ${mimeType}`);
+    throw new Error(`Formato não suportado: ${mimeType}`);
   }
 
   const prompt = buildPrompt(flashcardsQuantity, quizzesQuantity);
+  const base64Data = buffer.toString("base64");
+  const dataUrl = `data:${mimeType};base64,${base64Data}`;
 
-  try {
-    const base64Data = buffer.toString("base64");
-    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+  const fileModels = [
+    { model: "gemini-2.0-flash"},
+    { model: "gemini-2.0-flash-001"  },
+  ];
 
-    const result = await generateObject({
-      model: google("gemini-2.0-flash-exp"),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image",
-              image: dataUrl,
-            },
-            {
-              type: "text",
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      schema: aiResponseSchema,
-      temperature: 0.5,
-    });
+  for (const { model } of fileModels) {
+    try {
+      const result = await generateObject({
+        model: google(model),
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "image",
+                image: dataUrl,
+              },
+              {
+                type: "text",
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        schema: aiResponseSchema,
+        temperature: 0.5,
+      });
 
-    return result.object;
-  } catch (error) {
-    throw new Error("Falha ao processar arquivo com IA");
+      return result.object;
+    } catch (error) {
+      if (model !== fileModels[fileModels.length - 1].model) {
+        continue;
+      }
+      
+      throw new Error("Falha ao processar arquivo com todos os modelos disponíveis");
+    }
   }
+
+  throw new Error("Nenhum modelo disponível para processar arquivo");
 }
 
 function buildPrompt(flashcardsQty: number, quizzesQty: number): string {
