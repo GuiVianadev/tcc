@@ -1,5 +1,6 @@
 import axios from "axios";
 import { env } from "@/env";
+import { tokenManager } from "./token-manager";
 
 export const api = axios.create({
   baseURL: env.VITE_API_URL,
@@ -26,7 +27,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // Interceptor para adicionar o token JWT em todas as requisições
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("@cognitio:token");
+  const token = tokenManager.getToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -71,8 +72,8 @@ api.interceptors.response.use(
         );
         const { token } = response.data;
 
-        // Salva o novo token
-        localStorage.setItem("@cognitio:token", token);
+        // Salva o novo token em memória
+        tokenManager.setToken(token);
 
         // Atualiza o token na requisição original
         originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -84,7 +85,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Se o refresh falhar, desloga o usuário
         processQueue(refreshError, null);
-        localStorage.removeItem("@cognitio:token");
+        tokenManager.clearToken();
 
         if (window.location.pathname !== "/sign-in") {
           window.location.href = "/sign-in";

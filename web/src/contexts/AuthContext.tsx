@@ -4,6 +4,8 @@ import { signUp as signUpApi } from "@/api/sign-up";
 import { logout as logoutApi } from "@/api/logout";
 import { getCurrentUser } from "@/api/get-profile";
 import { refreshToken } from "@/api/refresh-token";
+import { tokenManager } from "@/lib/token-manager";
+import { migrateTokensToMemory } from "@/lib/migrate-tokens";
 
 // ========== TYPES ==========
 
@@ -46,21 +48,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   /**
    * Carrega os dados do usuário autenticado
+   * Tenta recuperar o token via refresh token (httpOnly cookie)
    */
   const loadUser = useCallback(async () => {
     try {
-      const token = localStorage.getItem("@cognitio:token");
+      // Migra tokens antigos do localStorage
+      migrateTokensToMemory();
 
-      if (!token) {
+      // Tenta fazer refresh do token usando o httpOnly cookie
+      // Se o cookie existir, o backend retornará um novo access token
+      try {
+        const newToken = await refreshToken();
+        tokenManager.setToken(newToken);
+      } catch (refreshError) {
+        // Se não conseguir fazer refresh, não há sessão ativa
         setIsLoading(false);
         return;
       }
 
+      // Com o token em memória, carrega os dados do usuário
       const response = await getCurrentUser();
       setUser(response.user);
     } catch (error) {
-      console.error("Erro ao carregar usuário:", error);
-      localStorage.removeItem("@cognitio:token");
+      tokenManager.clearToken();
     } finally {
       setIsLoading(false);
     }
@@ -83,8 +93,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      // Chama a API de login (já salva o token no localStorage)
-      await signInApi({ email, password });
+      // Chama a API de login e salva o token em memória
+      const { token } = await signInApi({ email, password });
+      tokenManager.setToken(token);
 
       // Carrega os dados do usuário
       const response = await getCurrentUser();
@@ -126,6 +137,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Erro ao fazer logout:", error);
     } finally {
       setUser(null);
+      tokenManager.clearToken();
 
       // Limpa o intervalo de refresh ao fazer logout
       if (refreshIntervalRef.current) {
@@ -148,9 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Configura novo intervalo para renovar o token a cada 8 minutos
     refreshIntervalRef.current = setInterval(async () => {
       try {
-        const token = localStorage.getItem("@cognitio:token");
-
-        if (!token) {
+        if (!tokenManager.hasToken()) {
           // Se não há token, limpa o intervalo
           if (refreshIntervalRef.current) {
             clearInterval(refreshIntervalRef.current);
@@ -159,7 +169,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           return;
         }
 
-        await refreshToken();
+        const newToken = await refreshToken();
+        tokenManager.setToken(newToken);
       } catch (error) {
         console.error("[Auth] Erro ao renovar token automaticamente:", error);
 
