@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import 'github-markdown-css/github-markdown-light.css';
+import 'github-markdown-css/github-markdown.css';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SummaryViewerProps {
@@ -75,10 +75,26 @@ export function SummaryViewer({
         </div>
       </CardHeader>
       <CardContent className="overflow-hidden px-4 sm:px-6">
-        <div className="markdown-body text-foreground" style={{
-          backgroundColor: 'transparent',
-          color: 'hsl(var(--foreground))'
-        }}>
+        <div
+          className="markdown-body"
+          style={{
+            backgroundColor: 'transparent',
+            color: 'hsl(var(--foreground))',
+          }}
+        >
+          <style>{`
+      .markdown-body table {
+        background-color: transparent !important;
+      }
+      .markdown-body table th,
+      .markdown-body table td {
+        background-color: transparent !important;
+        color: inherit !important;
+      }
+      .markdown-body table tr {
+        background-color: transparent !important;
+      }
+    `}</style>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       </CardContent>
