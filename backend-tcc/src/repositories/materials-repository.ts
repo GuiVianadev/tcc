@@ -50,7 +50,7 @@ export type MaterialsRepository = {
     }>;
   }>;
   findById(id: string): Promise<InferSelectModel<typeof materials> | null>;
-  findByTitle(title: string): Promise<InferSelectModel<typeof materials> | null>
+  findByTitle(title: string, userId: string): Promise<InferSelectModel<typeof materials> | null>
   searchManyByUserId(
     userId: string,
     page: number,

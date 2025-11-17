@@ -3,6 +3,7 @@ import {
   count,
   desc,
   eq,
+  and,
   type InferInsertModel,
   type InferSelectModel,
 } from "drizzle-orm";
@@ -91,11 +92,11 @@ export class DrizzleMaterialsRepository implements MaterialsRepository {
     return material;
   }
 
-  async findByTitle(title: string): Promise<InferSelectModel<typeof materials> | null> {
+  async findByTitle(title: string, userId: string): Promise<InferSelectModel<typeof materials> | null> {
      const [material] = await db
       .select()
       .from(materials)
-      .where(eq(materials.title, title))
+      .where(and(eq(materials.title, title), eq(materials.user_id, userId)))
       .execute();
     return material;
   }
