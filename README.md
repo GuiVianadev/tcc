@@ -1001,11 +1001,8 @@ Seguimos o [Conventional Commits](https://www.conventionalcommits.org/):
 
 - `feat`: Nova funcionalidade
 - `fix`: Correção de bug
-- `docs`: Documentação
 - `style`: Formatação de código
 - `refactor`: Refatoração sem mudança de comportamento
-- `test`: Adição/modificação de testes
-- `chore`: Tarefas de manutenção
 
 ### Code Style
 
@@ -1029,72 +1026,14 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ---
 
-## 👨‍💻 Autores
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/GuiVianadev">
-        <img src="https://github.com/GuiVianadev.png" width="100px;" alt="Guilherme Viana"/>
-        <br />
-        <sub><b>Guilherme Viana</b></sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/fredalisson">
-        <img src="https://github.com/fredalisson.png" width="100px;" alt="Fred Alisson"/>
-        <br />
-        <sub><b>Fred Alisson</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
-
----
-
-## 🙏 Agradecimentos
-
-- [Fastify](https://fastify.io/) - Framework web de alta performance
-- [React](https://react.dev/) - Biblioteca para interfaces
-- [Drizzle ORM](https://orm.drizzle.team/) - ORM moderno
-- [Vercel AI SDK](https://sdk.vercel.ai/) - Integração com IA
-- [Radix UI](https://www.radix-ui.com/) - Componentes acessíveis
-- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
-- Todos os contribuidores e a comunidade open source
-
----
-
 ## 📊 Status do Projeto
 
 ✅ **Versão 1.0.0** - Projeto completo e funcional
 
-### Roadmap Futuro
-
-- [ ] Testes automatizados para frontend
-- [ ] PWA com suporte offline
-- [ ] Notificações push para revisões
-- [ ] Modo colaborativo (grupos de estudo)
-- [ ] Integração com mais modelos de IA
-- [ ] Suporte para vídeos e áudios
-- [ ] Aplicativo mobile (React Native)
-- [ ] Exportação de estatísticas (PDF/CSV)
-- [ ] Sistema de badges e conquistas
-- [ ] Integração com calendários externos
-
----
-
-## 📞 Suporte
-
-Se você encontrou um bug ou tem uma sugestão:
-
-- Abra uma [issue](https://github.com/GuiVianadev/tcc/issues)
-- Entre em contato via email (verifique os perfis dos autores)
-
----
 
 <div align="center">
 
-**Desenvolvido com ❤️ por Guilherme Viana e Fred Alisson**
+**Desenvolvido por Guilherme Viana e Fred Alisson**
 
 [⬆ Voltar ao topo](#cognitio-ai---plataforma-de-estudos-com-ia)
 
